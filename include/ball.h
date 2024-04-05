@@ -10,6 +10,7 @@ private:
 public:
     ball(glm::vec3, float);
     void draw(MATERIAL, float, float, float);
+    void draw(MATERIAL);
     bool isCollide(object &);
     float getR();
 };

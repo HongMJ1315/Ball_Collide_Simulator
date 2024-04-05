@@ -7,11 +7,22 @@ void glInit(){
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-
+    //smooth shading
+    glShadeModel(GL_SMOOTH);
+    // Set light (directional light, sun light, white light)
+    GLfloat light_position[] = { 0.0, 0.0, -1.0, 0.0 };
+    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_diffuse[] = { 0.8, 0.8, 0.8, 1.0 };     // Diffuse light color (RGBA)
+    GLfloat light_specular[] = { 0.8, 0.8, 0.8, 1.0 };    // Specular light color (RGBA)
+    glLightfv(SUN_LIGHT, GL_POSITION, light_position);
+    glLightfv(SUN_LIGHT, GL_AMBIENT, light_ambient);
+    glLightfv(SUN_LIGHT, GL_DIFFUSE, light_diffuse);
+    glLightfv(SUN_LIGHT, GL_SPECULAR, light_specular);
     glEnable(SUN_LIGHT);
 }
 
 void initObjects(std::vector<object *> &objs){
+    /*
     objs.push_back(new cube(glm::vec3(0, 0, 0), 1, 1, 1));
     objs.push_back(new ball(glm::vec3(5, 0, 0), 5 / 2.0f));
     objs.push_back(new ball(glm::vec3(3, 2, 0), 1 / 2.0f));
@@ -29,6 +40,31 @@ void initObjects(std::vector<object *> &objs){
     objs[2]->setM(1.0f);
     objs[3]->setM(2.0f);
     objs[4]->setM(4.0f);
+    */
+    objs.push_back(new cube(glm::vec3(0, 10, 10), 20, 20, 0.1));
+    objs.back()->setColor(glm::vec3(0.0f, 0.0f, 0.5f));
+    objs.push_back(new cube(glm::vec3(0, 10, -10), 20, 20, 0.1));
+    objs.back()->setColor(glm::vec3(0.0f, 0.0f, 0.5f));
+    objs.push_back(new cube(glm::vec3(10, 10, 0), 0.1, 20, 20));
+    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
+    objs.push_back(new cube(glm::vec3(-10, 10, 0), 0.1, 20, 20));
+    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
+    objs.push_back(new cube(glm::vec3(0, 0, 0), 20, 0.1, 20));
+    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.5f));
+
+
+    objs.push_back(new ball(glm::vec3(10, 21, 1), 1));
+    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+    objs.back()->setV(glm::vec3(-1, 0, 0));
+    objs.push_back(new ball(glm::vec3(10, 21, 3), 1));
+    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+    objs.back()->setV(glm::vec3(-2, 0, 0));
+    objs.push_back(new ball(glm::vec3(10, 21, 5), 1));
+    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+    objs.back()->setV(glm::vec3(-0.5, 0, 1));
+    objs.push_back(new ball(glm::vec3(10, 21, 7), 1));
+    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+    objs.back()->setV(glm::vec3(-3, 0, 1));
 }
 
 void move(float dx, float dy, float dz, glm::vec3 &frontPos, glm::vec3 &cameraPos){
@@ -98,6 +134,7 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
     glPushMatrix();
     gluOrtho2D(0, width, 0, height);
     glMatrixMode(GL_MODELVIEW);
+    SetMaterial(MATERIAL::OBJECT, 0.0f, 1.0f, 0.0f);
     glPushMatrix();
     glLoadIdentity();
     glRasterPos2f(10, height - 30);
@@ -131,7 +168,7 @@ void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::
     gluLookAt(cameraPos.x, cameraPos.y, cameraPos.z, frontPos.x, frontPos.y, frontPos.z, 0.0f, 1.0f, 0.0f);
 
     for(auto &obj : objs){
-        obj->draw(MATERIAL::OBJECT, 1.0f, 0.0f, 0.0f);
+        obj->draw(MATERIAL::OBJECT);
     }
     glfwSwapBuffers(window);
     GLenum error = glGetError();
@@ -182,6 +219,7 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){
 }
 
 void updatePhysics(float dt, std::vector<object *> &objs){
+    /*
     // objs[1] 對 objs[0] 圓周運動
     glm::vec3 loc0 = objs[0]->getLoc();
     float m0 = objs[0]->getM();  // 獲取objs[0]的質量
@@ -195,7 +233,13 @@ void updatePhysics(float dt, std::vector<object *> &objs){
         a = F / m;  // 使用牛頓第二運動定律計算加速度
         objs[i]->setA(a);
     }
-
+    */
+    for(auto &obj : objs){
+        ball *b = dynamic_cast<ball *>(obj);
+        if(b != nullptr){
+            b->setA(glm::vec3(0, -9.8, 0));
+        }
+    }
     for(auto &obj : objs){
         obj->update(dt);
     }

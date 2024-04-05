@@ -12,8 +12,8 @@ void SetMaterial(MATERIAL materialType, float r, float g, float b){
     switch(materialType){
         // plastic
         case OBJECT:
-        mat_specular[0] = 0.5; mat_specular[1] = 0.5; mat_specular[2] = 0.5;
-        mat_shininess[0] = 32.0;
+        mat_specular[0] = 0.3; mat_specular[1] = 0.3; mat_specular[2] = 0.3;
+        mat_shininess[0] = 10.0;
         break;
 
         // earth

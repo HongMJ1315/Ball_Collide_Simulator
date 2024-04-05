@@ -10,8 +10,8 @@
 std::vector<object *> objs;
 
 int width = 800, height = 600;
-glm::vec3 cameraPos = glm::vec3(0, 0, 0);
-glm::vec3 frontPos = glm::vec3(0, 0, 10);
+glm::vec3 cameraPos = glm::vec3(0, 23, -15);
+glm::vec3 frontPos = glm::vec3(0, 22, -5);
 
 void reshape(GLFWwindow *window, int w, int h){
     width = w;

@@ -26,6 +26,10 @@ void object::draw(MATERIAL m, float r, float g, float b){
     std::cout << "object draw" << std::endl;
 }
 
+void object::draw(MATERIAL m){
+    std::cout << "object draw" << std::endl;
+}
+
 glm::vec3 object::getLoc(){
     return this->loc;
 }
@@ -80,3 +84,6 @@ object::~object(){
     std::cout << "object destruct" << std::endl;
 }
 
+void object::setColor(glm::vec3 color){
+    this->color = color;
+}

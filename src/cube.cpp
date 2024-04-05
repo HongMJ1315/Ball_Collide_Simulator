@@ -33,6 +33,26 @@ void cube::draw(MATERIAL m, float r, float g, float b){
     glPopMatrix();
 }
 
+void cube::draw(MATERIAL m){
+    SetMaterial(m, color.x, color.y, color.z);
+    glPushMatrix();
+    glTranslatef(loc.x, loc.y, loc.z);
+    glScalef(l, w, h);
+    for(int i = 0; i < 6; i++){
+        glBegin(GL_POLYGON);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3fv(points[faces[i][0]]);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3fv(points[faces[i][1]]);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3fv(points[faces[i][2]]);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3fv(points[faces[i][3]]);
+        glEnd();
+    }
+    glPopMatrix();
+}
+
 bool cube::isCollide(object &obj){
     cube *c = dynamic_cast<cube *>(&obj);
     if(c != nullptr){

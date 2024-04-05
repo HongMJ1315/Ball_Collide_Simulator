@@ -9,6 +9,7 @@ private:
 public:
     cube(glm::vec3, float, float, float);
     void draw(MATERIAL, float, float, float);
+    void draw(MATERIAL);
     bool isCollide(object &);
     float getL();
     float getW();

@@ -6,6 +6,7 @@
 ball::ball(glm::vec3 loc, float r) :object(loc){
     this->loc = loc, this->r = r;
 }
+
 void ball::draw(MATERIAL m, float r, float g, float b){
     SetMaterial(m, r, g, b);
     glPushMatrix();
@@ -14,6 +15,16 @@ void ball::draw(MATERIAL m, float r, float g, float b){
     glutSolidSphere(1.0, 20, 20);
     glPopMatrix();
 }
+
+void ball::draw(MATERIAL m){
+    SetMaterial(m, color.x, color.y, color.z);
+    glPushMatrix();
+    glScalef(this->r, this->r, this->r);
+    glTranslatef(loc.x, loc.y, loc.z);
+    glutSolidSphere(1.0, 20, 20);
+    glPopMatrix();
+}
+
 bool ball::isCollide(object &obj){
     cube *c = dynamic_cast<cube *>(&obj);
     if(c != nullptr){

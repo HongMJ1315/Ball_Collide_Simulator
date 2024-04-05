@@ -10,7 +10,7 @@
 
 class object{
 protected:
-    glm::vec3 loc, v, a;
+    glm::vec3 loc, v, a, color;
     std::string name;
     float m;
 public:
@@ -23,6 +23,7 @@ public:
     void setLoc(glm::vec3);
     void setM(float);
     void setName(std::string);
+    void setColor(glm::vec3);
     glm::vec3 getV();
     glm::vec3 getA();
     glm::vec3 getLoc();
@@ -30,6 +31,7 @@ public:
     std::string getName();
     virtual ~object();
     virtual void draw(MATERIAL, float, float, float);
+    virtual void draw(MATERIAL);
     virtual bool isCollide(object &);
 };
 
