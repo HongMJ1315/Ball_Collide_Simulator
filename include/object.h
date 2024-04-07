@@ -5,8 +5,8 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include "matrix.h"
 
-#define ESP 1e-6
 
 class object{
 protected:

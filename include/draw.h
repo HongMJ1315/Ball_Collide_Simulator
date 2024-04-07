@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include <random>
-#define MOVE_SPEED 0.1f
+#define MOVE_SPEED 0.5f
 #define ROTATE_SPEED 0.1f
 
 

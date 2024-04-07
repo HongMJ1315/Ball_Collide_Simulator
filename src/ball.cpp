@@ -4,24 +4,24 @@
 #include "GLinclude.h"
 
 ball::ball(glm::vec3 loc, float r) :object(loc){
-    this->loc = loc, this->r = r;
+    this->r = r;
 }
 
 void ball::draw(MATERIAL m, float r, float g, float b){
     SetMaterial(m, r, g, b);
     glPushMatrix();
+    glTranslatef(object::getLoc().x, object::getLoc().y, object::getLoc().z);
     glScalef(this->r, this->r, this->r);
-    glTranslatef(loc.x, loc.y, loc.z);
-    glutSolidSphere(1.0, 20, 20);
+    glutSolidSphere(1, 20, 20);
     glPopMatrix();
 }
 
 void ball::draw(MATERIAL m){
     SetMaterial(m, color.x, color.y, color.z);
     glPushMatrix();
+    glTranslatef(object::getLoc().x, object::getLoc().y, object::getLoc().z);
     glScalef(this->r, this->r, this->r);
-    glTranslatef(loc.x, loc.y, loc.z);
-    glutSolidSphere(1.0, 20, 20);
+    glutSolidSphere(1, 20, 20);
     glPopMatrix();
 }
 
@@ -43,15 +43,8 @@ bool ball::isCollide(object &obj){
     }
     ball *b = dynamic_cast<ball *>(&obj);
     if(b != nullptr){
-        glm::vec2 bx = glm::vec2(b->getLoc().x - b->getR(), b->getLoc().x + b->getR());
-        glm::vec2 by = glm::vec2(b->getLoc().y - b->getR(), b->getLoc().y + b->getR());
-        glm::vec2 bz = glm::vec2(b->getLoc().z - b->getR(), b->getLoc().z + b->getR());
-        glm::vec2 cx = glm::vec2(loc.x - r, loc.x + r);
-        glm::vec2 cy = glm::vec2(loc.y - r, loc.y + r);
-        glm::vec2 cz = glm::vec2(loc.z - r, loc.z + r);
-        if(((cx.x - bx.x < ESP && bx.x - cx.y < ESP) || (bx.x - cx.x < ESP && cx.x - bx.y < ESP)) &&
-            ((cy.x - by.x < ESP && by.x - cy.y < ESP) || (by.x - cy.x < ESP && cy.x - by.y < ESP)) &&
-            ((cz.x - bz.x < ESP && bz.x - cz.y < ESP) || (bz.x - cz.x < ESP && cz.x - bz.y < ESP))){
+        float dis = (loc.x - b->getLoc().x) * (loc.x - b->getLoc().x) + (loc.y - b->getLoc().y) * (loc.y - b->getLoc().y) + (loc.z - b->getLoc().z) * (loc.z - b->getLoc().z);
+        if(dis - (r + b->getR()) * (r + b->getR()) < ESP){
             return 1;
         }
         else return 0;

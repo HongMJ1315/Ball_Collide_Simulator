@@ -1,8 +1,10 @@
 #include "draw.h"
+#define BOX_SIZE 50
 
 
 int keyState[GLFW_KEY_LAST] = { 0 };
 int directionKey[4] = { 0 };
+bool phyActive = false;
 void glInit(){
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -41,30 +43,67 @@ void initObjects(std::vector<object *> &objs){
     objs[3]->setM(2.0f);
     objs[4]->setM(4.0f);
     */
-    objs.push_back(new cube(glm::vec3(0, 10, 10), 20, 20, 0.1));
-    objs.back()->setColor(glm::vec3(0.0f, 0.0f, 0.5f));
-    objs.push_back(new cube(glm::vec3(0, 10, -10), 20, 20, 0.1));
-    objs.back()->setColor(glm::vec3(0.0f, 0.0f, 0.5f));
-    objs.push_back(new cube(glm::vec3(10, 10, 0), 0.1, 20, 20));
-    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
-    objs.push_back(new cube(glm::vec3(-10, 10, 0), 0.1, 20, 20));
-    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
-    objs.push_back(new cube(glm::vec3(0, 0, 0), 20, 0.1, 20));
+    objs.push_back(new cube(glm::vec3(0, 0, 0), BOX_SIZE, 0.1, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.5f));
+    objs.back()->setM(1e10);
+    objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 4, BOX_SIZE / 2), BOX_SIZE, 250, 0.1));
+    objs.back()->setColor(glm::vec3(0.0f, 0.0f, 0.5f));
+    objs.back()->setM(1e10);
+    objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 4, -BOX_SIZE / 2), BOX_SIZE, 250, 0.1));
+    objs.back()->setColor(glm::vec3(0.0f, 0.0f, 0.5f));
+    objs.back()->setM(1e10);
+    objs.push_back(new cube(glm::vec3(BOX_SIZE / 2, BOX_SIZE / 4, 0), 0.1, 250, BOX_SIZE));
+    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
+    objs.back()->setM(1e10);
+    objs.push_back(new cube(glm::vec3(-BOX_SIZE / 2, BOX_SIZE / 4, 0), 0.1, 250, BOX_SIZE));
+    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
+    objs.back()->setM(1e10);
 
 
-    objs.push_back(new ball(glm::vec3(10, 21, 1), 1));
-    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
-    objs.back()->setV(glm::vec3(-1, 0, 0));
-    objs.push_back(new ball(glm::vec3(10, 21, 3), 1));
-    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
-    objs.back()->setV(glm::vec3(-2, 0, 0));
-    objs.push_back(new ball(glm::vec3(10, 21, 5), 1));
-    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
-    objs.back()->setV(glm::vec3(-0.5, 0, 1));
-    objs.push_back(new ball(glm::vec3(10, 21, 7), 1));
-    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
-    objs.back()->setV(glm::vec3(-3, 0, 1));
+    // objs.push_back(new ball(glm::vec3(10, 23, 1), 1));
+    // objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.0f));
+    // objs.back()->setV(glm::vec3(-4, 0.5, 0));
+    // objs.back()->setM(1);
+    // objs.push_back(new ball(glm::vec3(10, 23, 3), 1));
+    // objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
+    // objs.back()->setV(glm::vec3(-2, -0.2, 0));
+    // objs.back()->setM(1);
+    // objs.push_back(new ball(glm::vec3(10, 23, 5), 1));
+    // objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
+    // objs.back()->setV(glm::vec3(-3, 0.7, 1));
+    // objs.back()->setM(1);
+    // objs.push_back(new ball(glm::vec3(10, 23, 7), 1));
+    // objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
+    // objs.back()->setV(glm::vec3(-7, 10, 0));
+    // objs.back()->setM(1);
+    std::random_device rd;
+    std::mt19937 gen(1234);
+    for(int I = 0; I < 20; I += 2){
+        for(int i = 1; i <= 10; i++){
+            objs.push_back(new ball(glm::vec3(10, 25 + 3 * I, -BOX_SIZE / 2 + i * 4), 1.5));
+            objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0));
+            objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
+            objs.back()->setM(float(gen() % 5) + 1);
+        }
+        for(int i = 1; i <= 10; i++){
+            objs.push_back(new ball(glm::vec3(-10, 25 + 3 * I, -BOX_SIZE / 2 + i * 4), 1.5));
+            objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0));
+            objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
+            objs.back()->setM(float(gen() % 5) + 1);
+        }
+        for(int i = 1; i <= 10; i++){
+            objs.push_back(new ball(glm::vec3(-BOX_SIZE / 2 + i * 4, 25 + 3 * I * 2, -10), 1.5));
+            objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0));
+            objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
+            objs.back()->setM(float(gen() % 5) + 1);
+        }
+        for(int i = 1; i <= 10; i++){
+            objs.push_back(new ball(glm::vec3(-BOX_SIZE / 2 + i * 4, 25 + 3 * I * 2, 10), 1.5));
+            objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0));
+            objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
+            objs.back()->setM(float(gen() % 5) + 1);
+        }
+    }
 }
 
 void move(float dx, float dy, float dz, glm::vec3 &frontPos, glm::vec3 &cameraPos){
@@ -167,6 +206,7 @@ void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::
     glEnable(GL_LIGHTING);
     gluLookAt(cameraPos.x, cameraPos.y, cameraPos.z, frontPos.x, frontPos.y, frontPos.z, 0.0f, 1.0f, 0.0f);
 
+    glMatrixMode(GL_MODELVIEW);
     for(auto &obj : objs){
         obj->draw(MATERIAL::OBJECT);
     }
@@ -182,7 +222,9 @@ void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::
 void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){
     if(action == GLFW_PRESS){
         keyState[key] = true;
-
+        if(key == GLFW_KEY_P){
+            phyActive = !phyActive;
+        }
         switch(key){
             case GLFW_KEY_UP:
             directionKey[0] = true;
@@ -219,6 +261,7 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){
 }
 
 void updatePhysics(float dt, std::vector<object *> &objs){
+    if(!phyActive) return;
     /*
     // objs[1] 對 objs[0] 圓周運動
     glm::vec3 loc0 = objs[0]->getLoc();
@@ -234,13 +277,87 @@ void updatePhysics(float dt, std::vector<object *> &objs){
         objs[i]->setA(a);
     }
     */
+    for(int i = 1; i < objs.size(); i++){
+        for(int j = i + 1; j < objs.size(); j++){
+            if(objs[i]->isCollide(*(objs[j]))){
+                cube *c = dynamic_cast<cube *>(objs[i]);
+                if(c != nullptr){
+                    ball *b = dynamic_cast<ball *>(objs[j]);
+                    if(b != nullptr){
+                        float cl = c->getL();
+                        float ch = c->getH();
+                        if(ch > cl){
+                            if(b->getLoc().x < c->getLoc().x){
+                                b->setLoc(glm::vec3(c->getLoc().x - b->getR(), b->getLoc().y, b->getLoc().z));
+                            }
+                            else{
+                                b->setLoc(glm::vec3(c->getLoc().x + b->getR(), b->getLoc().y, b->getLoc().z));
+                            }
+                            b->setV(glm::vec3(-b->getV().x, b->getV().y, b->getV().z));
+                        }
+                        else{
+                            if(b->getLoc().z < c->getLoc().z){
+                                b->setLoc(glm::vec3(b->getLoc().x, b->getLoc().y, c->getLoc().z - b->getR()));
+                            }
+                            else{
+                                b->setLoc(glm::vec3(b->getLoc().x, b->getLoc().y, c->getLoc().z + b->getR()));
+                            }
+                            b->setV(glm::vec3(b->getV().x, b->getV().y, -b->getV().z));
+                        }
+
+                    }
+                    continue;
+                }
+                ball *b1 = (dynamic_cast<ball *>(objs[i]));
+                ball *b2 = (dynamic_cast<ball *>(objs[j]));
+                if(b1 == nullptr || b2 == nullptr) continue;
+                glm::vec3 v1 = objs[i]->getV();
+                glm::vec3 v2 = objs[j]->getV();
+                glm::vec3 loc1 = objs[i]->getLoc();
+                glm::vec3 loc2 = objs[j]->getLoc();
+                float m1 = objs[i]->getM();
+                float m2 = objs[j]->getM();
+                glm::vec3 diff_loc = loc1 - loc2;
+                //v1' = v1 - ((2 * m2 / (m1 + m2)) * (v1 - v2) * (loc1 - loc2) / |loc1 - loc2|^2)*(loc1 - loc2)
+                glm::vec3 v1_after = v1 - ((2 * m2 / (m1 + m2)) * glm::dot(v1 - v2, loc1 - loc2) / glm::dot(loc1 - loc2, loc1 - loc2)) * (loc1 - loc2);
+                glm::vec3 v2_after = v2 - ((2 * m1 / (m1 + m2)) * glm::dot(v2 - v1, loc2 - loc1) / glm::dot(loc2 - loc1, loc2 - loc1)) * (loc2 - loc1);
+                objs[i]->setV(v1_after);
+                objs[j]->setV(v2_after);
+
+                glm::vec3 oloc1 = b1->getLoc();
+                glm::vec3 oloc2 = b2->getLoc();
+                glm::vec3 dirVec = oloc1 - oloc2;
+                if(glm::length(dirVec) < b1->getR() + b2->getR()){
+                    b1->setLoc(oloc1 + glm::normalize(dirVec) * (2 * b1->getR() - glm::length(dirVec)));
+                    b2->setLoc(oloc2 - glm::normalize(dirVec) * (2 * b2->getR() - glm::length(dirVec)));
+                }
+            }
+        }
+    }
+    for(auto &obj : objs){
+        obj->update(dt / 2);
+    }
     for(auto &obj : objs){
         ball *b = dynamic_cast<ball *>(obj);
+        //彈性係數 0.8
         if(b != nullptr){
+            /*
+            if(b->getA().y < ESP && b->getLoc().y - b->getR() < ESP && b->getV().y < ESP){
+                // F = -u * m * g
+                glm::vec3 v = b->getV();
+                glm::vec3 f = glm::vec3(-0.5 * 9.8 * b->getM() * glm::normalize(v).x, 0, -0.5 * 9.8 * b->getM() * glm::normalize(v).z);
+                b->setA(f / b->getM());
+                continue;
+            }
+            */
+            if(b->getLoc().y - b->getR() < ESP){
+                b->setLoc(glm::vec3(b->getLoc().x, b->getR(), b->getLoc().z));
+                b->setV(glm::vec3(b->getV().x, -0.8 * b->getV().y, b->getV().z));
+            }
             b->setA(glm::vec3(0, -9.8, 0));
         }
     }
     for(auto &obj : objs){
-        obj->update(dt);
+        obj->update(dt / 2);
     }
 }

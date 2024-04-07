@@ -9,9 +9,11 @@
 
 std::vector<object *> objs;
 
-int width = 800, height = 600;
-glm::vec3 cameraPos = glm::vec3(0, 23, -15);
-glm::vec3 frontPos = glm::vec3(0, 22, -5);
+int width = 1600, height = 1600 * 9 / 16;
+glm::vec3 cameraPos = glm::vec3(0, 175, -28);
+glm::vec3 frontVec = glm::vec3(0, -1, 1);
+
+glm::vec3 frontPos /*= glm::vec3(0, 22, -5)*/;
 
 void reshape(GLFWwindow *window, int w, int h){
     width = w;
@@ -46,6 +48,8 @@ int main(int argc, char **argv){
         std::cout << "error: " << glewGetErrorString(err) << std::endl;
         exit(-1);
     }
+    frontVec = glm::normalize(frontVec);
+    frontPos = cameraPos + frontVec;
     glInit();
     initObjects(objs);
 
@@ -59,7 +63,7 @@ int main(int argc, char **argv){
         double currentTime = glfwGetTime();
         float dt = currentTime - lastTimePhy;
         cntFps++;
-        if(dt > 0.001){
+        if(dt > ESP){
             updatePhysics(dt, objs);
             lastTimePhy = currentTime;
         }
