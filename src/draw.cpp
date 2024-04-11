@@ -1,11 +1,26 @@
 #include "draw.h"
-#define BOX_SIZE 50
+#define BOX_SIZE 21
 
 
 int keyState[GLFW_KEY_LAST] = { 0 };
 int directionKey[4] = { 0 };
 bool phyActive = false;
+unsigned int textName[10];
+unsigned char floorText[TEXTURE_SIZE][TEXTURE_SIZE][4];
+
+void initTexture(){
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 10);
+    glGenTextures(10, textName);
+    GenerateTexture(floorText);
+    TextureInit(TEXTURE::T_FLOOR, textName, floorText, TEXTURE_SIZE, TEXTURE_SIZE);
+}
 void glInit(){
+    // setGLSLshaders("shader/Phong.vert", "shader/Phong.frag");
+    // int texLoc = glGetUniformLocation(ReturnProgramID(), "myTex");
+    // std::cout << texLoc << std::endl;
+    // glUniform1i(texLoc, 0);
+
+
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -24,85 +39,61 @@ void glInit(){
 }
 
 void initObjects(std::vector<object *> &objs){
-    /*
-    objs.push_back(new cube(glm::vec3(0, 0, 0), 1, 1, 1));
-    objs.push_back(new ball(glm::vec3(5, 0, 0), 5 / 2.0f));
-    objs.push_back(new ball(glm::vec3(3, 2, 0), 1 / 2.0f));
-    objs.push_back(new ball(glm::vec3(7, 0, 0), 2 / 2.0f));
-    objs.push_back(new ball(glm::vec3(2, 3, 0), 4 / 2.0f));
-
-    objs[0]->setV(glm::vec3(1, 0, 0));
-    objs[1]->setV(glm::vec3(0, 2 * 10, 2.5 * 10));
-    objs[2]->setV(glm::vec3(0, -3 * 10, 3.5 * 10));
-    objs[3]->setV(glm::vec3(0, -1 * 10, -0.5 * 10));
-    objs[4]->setV(glm::vec3(0, 0, 1.0 * 10));
-
-    objs[0]->setM(100.0f);
-    objs[1]->setM(5.0f);
-    objs[2]->setM(1.0f);
-    objs[3]->setM(2.0f);
-    objs[4]->setM(4.0f);
-    */
     objs.push_back(new cube(glm::vec3(0, 0, 0), BOX_SIZE, 0.1, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.5f));
     objs.back()->setM(1e10);
-    objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 4, BOX_SIZE / 2), BOX_SIZE, 250, 0.1));
-    objs.back()->setColor(glm::vec3(0.0f, 0.0f, 0.5f));
+    objs.back()->setName("Ground");
+    objs.back()->setTexture(TEXTURE::T_FLOOR, textName);
+    objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, BOX_SIZE / 2 + 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
+    objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
-    objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 4, -BOX_SIZE / 2), BOX_SIZE, 250, 0.1));
-    objs.back()->setColor(glm::vec3(0.0f, 0.0f, 0.5f));
+    objs.back()->setName("Wall");
+    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, -BOX_SIZE / 2 - 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
+    objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
-    objs.push_back(new cube(glm::vec3(BOX_SIZE / 2, BOX_SIZE / 4, 0), 0.1, 250, BOX_SIZE));
-    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
+    objs.back()->setName("Wall");
+    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.push_back(new cube(glm::vec3(BOX_SIZE / 2 + 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
+    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
-    objs.push_back(new cube(glm::vec3(-BOX_SIZE / 2, BOX_SIZE / 4, 0), 0.1, 250, BOX_SIZE));
-    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
+    objs.back()->setName("Wall");
+    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.push_back(new cube(glm::vec3(-BOX_SIZE / 2 - 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
+    objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
+    objs.back()->setName("Wall");
+    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.push_back(new cube(glm::vec3(0, 3, 0), 6, 6, 6));
+    objs.back()->setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+    objs.back()->setM(1e10);
+    objs.back()->setName("Cube");
+    objs.back()->setMaterial(MATERIAL::M_OBJECT);
 
 
-    // objs.push_back(new ball(glm::vec3(10, 23, 1), 1));
-    // objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.0f));
-    // objs.back()->setV(glm::vec3(-4, 0.5, 0));
-    // objs.back()->setM(1);
-    // objs.push_back(new ball(glm::vec3(10, 23, 3), 1));
-    // objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
-    // objs.back()->setV(glm::vec3(-2, -0.2, 0));
-    // objs.back()->setM(1);
-    // objs.push_back(new ball(glm::vec3(10, 23, 5), 1));
-    // objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
-    // objs.back()->setV(glm::vec3(-3, 0.7, 1));
-    // objs.back()->setM(1);
-    // objs.push_back(new ball(glm::vec3(10, 23, 7), 1));
-    // objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.5f));
-    // objs.back()->setV(glm::vec3(-7, 10, 0));
-    // objs.back()->setM(1);
     std::random_device rd;
     std::mt19937 gen(1234);
-    for(int I = 0; I < 20; I += 2){
-        for(int i = 1; i <= 10; i++){
-            objs.push_back(new ball(glm::vec3(10, 25 + 3 * I, -BOX_SIZE / 2 + i * 4), 1.5));
-            objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0));
-            objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
-            objs.back()->setM(float(gen() % 5) + 1);
+    // int K; std::cin >> K;
+
+    for(int i = 1; i <= 20; i++){
+        for(int j = 0; j < 2; j++){
+            for(int k = 0; k < 4; k++){
+                objs.push_back(new ball(glm::vec3(8 - k * 5, 10 + j, -BOX_SIZE / 2 - 0.5 + i), 0.3));
+                objs.back()->setColor(glm::vec3(1.0f, 0, 0));
+                objs.back()->setM(float(gen() % 5) + 1);
+                objs.back()->setMaterial(MATERIAL::M_OBJECT);
+            }
         }
-        for(int i = 1; i <= 10; i++){
-            objs.push_back(new ball(glm::vec3(-10, 25 + 3 * I, -BOX_SIZE / 2 + i * 4), 1.5));
-            objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0));
-            objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
-            objs.back()->setM(float(gen() % 5) + 1);
-        }
-        for(int i = 1; i <= 10; i++){
-            objs.push_back(new ball(glm::vec3(-BOX_SIZE / 2 + i * 4, 25 + 3 * I * 2, -10), 1.5));
-            objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0));
-            objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
-            objs.back()->setM(float(gen() % 5) + 1);
-        }
-        for(int i = 1; i <= 10; i++){
-            objs.push_back(new ball(glm::vec3(-BOX_SIZE / 2 + i * 4, 25 + 3 * I * 2, 10), 1.5));
-            objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0));
-            objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
-            objs.back()->setM(float(gen() % 5) + 1);
-        }
+    }
+    for(int i = 0; i < 90; i++){
+        int x = gen() % 4;
+        int y = gen() % 5;
+        int z = gen() % 20 + 1;
+        objs.push_back(new ball(glm::vec3(8 - x * 5, 16 + y, -BOX_SIZE / 2 - 0.5 + z), 0.3));
+        objs.back()->setColor(glm::vec3(1.0f, 0, 0));
+        objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
+        objs.back()->setM(float(gen() % 5) + 1);
+        objs.back()->setMaterial(MATERIAL::M_OBJECT);
     }
 }
 
@@ -173,7 +164,7 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
     glPushMatrix();
     gluOrtho2D(0, width, 0, height);
     glMatrixMode(GL_MODELVIEW);
-    SetMaterial(MATERIAL::OBJECT, 0.0f, 1.0f, 0.0f);
+    SetMaterial(MATERIAL::M_OBJECT, 0.0f, 1.0f, 0.0f);
     glPushMatrix();
     glLoadIdentity();
     glRasterPos2f(10, height - 30);
@@ -195,6 +186,8 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
 }
 
 void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::vec3 &cameraPos, glm::vec3 &frontPos, std::vector<object *> &objs){
+    // glUseProgram(ReturnProgramID());
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     drawCoordinateString(cameraPos, frontPos, width, height, dt, fps);
@@ -208,7 +201,7 @@ void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::
 
     glMatrixMode(GL_MODELVIEW);
     for(auto &obj : objs){
-        obj->draw(MATERIAL::OBJECT);
+        obj->draw();
     }
     glfwSwapBuffers(window);
     GLenum error = glGetError();
@@ -262,46 +255,64 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){
 
 void updatePhysics(float dt, std::vector<object *> &objs){
     if(!phyActive) return;
-    /*
-    // objs[1] 對 objs[0] 圓周運動
-    glm::vec3 loc0 = objs[0]->getLoc();
-    float m0 = objs[0]->getM();  // 獲取objs[0]的質量
-    for(int i = 1; i < objs.size(); i++){
-        glm::vec3 v = objs[i]->getV();
-        glm::vec3 a = objs[i]->getA();
-        glm::vec3 loc = objs[i]->getLoc();
-        glm::vec3 r = loc - loc0;
-        float m = objs[i]->getM();  // 獲取objs[i]的質量
-        glm::vec3 F = glm::vec3(5, 5, 5) * m0 * m / (glm::length(r) * glm::length(r));  // 使用牛頓的萬有引力定律計算力
-        a = F / m;  // 使用牛頓第二運動定律計算加速度
-        objs[i]->setA(a);
-    }
-    */
     for(int i = 1; i < objs.size(); i++){
         for(int j = i + 1; j < objs.size(); j++){
             if(objs[i]->isCollide(*(objs[j]))){
                 cube *c = dynamic_cast<cube *>(objs[i]);
-                if(c != nullptr){
+                if(c != nullptr && c->getName() == "Wall"){
                     ball *b = dynamic_cast<ball *>(objs[j]);
                     if(b != nullptr){
-                        float cl = c->getL();
-                        float ch = c->getH();
+                        float cl = c->getL() / 2;
+                        float ch = c->getH() / 2;
                         if(ch > cl){
                             if(b->getLoc().x < c->getLoc().x){
-                                b->setLoc(glm::vec3(c->getLoc().x - b->getR(), b->getLoc().y, b->getLoc().z));
+                                b->setLoc(glm::vec3(c->getLoc().x - b->getR() - cl, b->getLoc().y, b->getLoc().z));
                             }
                             else{
-                                b->setLoc(glm::vec3(c->getLoc().x + b->getR(), b->getLoc().y, b->getLoc().z));
+                                b->setLoc(glm::vec3(c->getLoc().x + b->getR() + cl, b->getLoc().y, b->getLoc().z));
                             }
                             b->setV(glm::vec3(-b->getV().x, b->getV().y, b->getV().z));
                         }
                         else{
                             if(b->getLoc().z < c->getLoc().z){
-                                b->setLoc(glm::vec3(b->getLoc().x, b->getLoc().y, c->getLoc().z - b->getR()));
+                                b->setLoc(glm::vec3(b->getLoc().x, b->getLoc().y, c->getLoc().z - b->getR() - ch));
                             }
                             else{
-                                b->setLoc(glm::vec3(b->getLoc().x, b->getLoc().y, c->getLoc().z + b->getR()));
+                                b->setLoc(glm::vec3(b->getLoc().x, b->getLoc().y, c->getLoc().z + b->getR() + ch));
                             }
+                            b->setV(glm::vec3(b->getV().x, b->getV().y, -b->getV().z));
+                        }
+                        b->setColor(glm::vec3(0, 0, 1));
+                    }
+                    continue;
+                }
+                if(c != nullptr && c->getName() == "Cube"){
+                    ball *b = dynamic_cast<ball *>(objs[j]);
+                    if(b != nullptr){
+                        float cl = c->getL();
+                        float ch = c->getH();
+                        float cw = c->getW();
+                        //撞到上面
+                        if(b->getLoc().y > c->getLoc().y + ch / 2){
+                            b->setLoc(glm::vec3(b->getLoc().x, c->getLoc().y + ch / 2 + b->getR(), b->getLoc().z));
+                            b->setV(glm::vec3(b->getV().x, 0.8 * -b->getV().y, b->getV().z));
+                        }
+                        //撞到左右
+                        else if(b->getLoc().x < c->getLoc().x - cl / 2){
+                            b->setLoc(glm::vec3(c->getLoc().x - cl / 2 - b->getR(), b->getLoc().y, b->getLoc().z));
+                            b->setV(glm::vec3(-b->getV().x, b->getV().y, b->getV().z));
+                        }
+                        else if(b->getLoc().x > c->getLoc().x + cl / 2){
+                            b->setLoc(glm::vec3(c->getLoc().x + cl / 2 + b->getR(), b->getLoc().y, b->getLoc().z));
+                            b->setV(glm::vec3(-b->getV().x, b->getV().y, b->getV().z));
+                        }
+                        //撞到前後
+                        else if(b->getLoc().z < c->getLoc().z - cw / 2){
+                            b->setLoc(glm::vec3(b->getLoc().x, b->getLoc().y, c->getLoc().z - cw / 2 - b->getR()));
+                            b->setV(glm::vec3(b->getV().x, b->getV().y, -b->getV().z));
+                        }
+                        else if(b->getLoc().z > c->getLoc().z + cw / 2){
+                            b->setLoc(glm::vec3(b->getLoc().x, b->getLoc().y, c->getLoc().z + cw / 2 + b->getR()));
                             b->setV(glm::vec3(b->getV().x, b->getV().y, -b->getV().z));
                         }
 
@@ -331,6 +342,8 @@ void updatePhysics(float dt, std::vector<object *> &objs){
                     b1->setLoc(oloc1 + glm::normalize(dirVec) * (2 * b1->getR() - glm::length(dirVec)));
                     b2->setLoc(oloc2 - glm::normalize(dirVec) * (2 * b2->getR() - glm::length(dirVec)));
                 }
+                b1->setColor(glm::vec3(0, 1, 0));
+                b2->setColor(glm::vec3(0, 1, 0));
             }
         }
     }
@@ -353,6 +366,7 @@ void updatePhysics(float dt, std::vector<object *> &objs){
             if(b->getLoc().y - b->getR() < ESP){
                 b->setLoc(glm::vec3(b->getLoc().x, b->getR(), b->getLoc().z));
                 b->setV(glm::vec3(b->getV().x, -0.8 * b->getV().y, b->getV().z));
+                b->setColor(glm::vec3(0, 0, 1));
             }
             b->setA(glm::vec3(0, -9.8, 0));
         }

@@ -8,18 +8,24 @@ object::object(glm::vec3 loc, glm::vec3 v, glm::vec3 a, float m){
     this->loc = loc;
     this->v = v;
     this->a = a;
+    this->material = MATERIAL::M_NONE;
+    this->texture = TEXTURE::T_NONE;
 }
 
 object::object(){
     this->loc = glm::vec3(0.0f, 0.0f, 0.0f);
     this->v = glm::vec3(0.0f, 0.0f, 0.0f);
     this->a = glm::vec3(0.0f, 0.0f, 0.0f);
+    this->material = MATERIAL::M_NONE;
+    this->texture = TEXTURE::T_NONE;
 }
 
 object::object(glm::vec3 loc){
     this->loc = loc;
     this->v = glm::vec3(0.0f, 0.0f, 0.0f);
     this->a = glm::vec3(0.0f, 0.0f, 0.0f);
+    this->material = MATERIAL::M_NONE;
+    this->texture = TEXTURE::T_NONE;
 }
 
 void object::draw(MATERIAL m, float r, float g, float b){
@@ -86,4 +92,21 @@ object::~object(){
 
 void object::setColor(glm::vec3 color){
     this->color = color;
+}
+
+void object::getColor(){
+    std::cout << "color: " << color.x << " " << color.y << " " << color.z << std::endl;
+}
+
+void object::draw(){
+    std::cout << "object draw" << std::endl;
+}
+
+void object::setMaterial(MATERIAL m){
+    this->material = m;
+}
+
+void object::setTexture(TEXTURE t, unsigned int *textName){
+    this->texture = t;
+    this->textName = textName;
 }

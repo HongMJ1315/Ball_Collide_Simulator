@@ -10,7 +10,7 @@
 std::vector<object *> objs;
 
 int width = 1600, height = 1600 * 9 / 16;
-glm::vec3 cameraPos = glm::vec3(0, 175, -28);
+glm::vec3 cameraPos = glm::vec3(0, 50, -28);
 glm::vec3 frontVec = glm::vec3(0, -1, 1);
 
 glm::vec3 frontPos /*= glm::vec3(0, 22, -5)*/;
@@ -50,6 +50,7 @@ int main(int argc, char **argv){
     }
     frontVec = glm::normalize(frontVec);
     frontPos = cameraPos + frontVec;
+    initTexture();
     glInit();
     initObjects(objs);
 
@@ -74,7 +75,6 @@ int main(int argc, char **argv){
         }
         update(frontPos, cameraPos);
         display(window, width, height, dt, fps, cameraPos, frontPos, objs);
-
         glfwPollEvents();
     }
 

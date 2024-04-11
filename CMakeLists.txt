@@ -56,3 +56,17 @@ target_link_libraries(${MY_EXECUTABLE} PRIVATE
     opencv_flann
     opencv_imgcodecs
 )
+
+
+add_custom_command(TARGET ${MY_EXECUTABLE} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+    "${CMAKE_CURRENT_SOURCE_DIR}/shader"
+    "$<TARGET_FILE_DIR:${MY_EXECUTABLE}>/shader"
+    VERBATIM
+)
+add_custom_command(TARGET ${MY_EXECUTABLE} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+    "${CMAKE_CURRENT_SOURCE_DIR}/texture"
+    "$<TARGET_FILE_DIR:${MY_EXECUTABLE}>/texture"
+    VERBATIM
+)

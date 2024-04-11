@@ -6,12 +6,16 @@
 #include <cmath>
 #include <string>
 #include "matrix.h"
+#include "texture.h"
 
 
 class object{
 protected:
     glm::vec3 loc, v, a, color;
     std::string name;
+    MATERIAL material;
+    TEXTURE texture;
+    unsigned int *textName;
     float m;
 public:
     object(glm::vec3 loc, glm::vec3 v, glm::vec3 a, float m);
@@ -24,6 +28,9 @@ public:
     void setM(float);
     void setName(std::string);
     void setColor(glm::vec3);
+    void getColor();
+    void setMaterial(MATERIAL);
+    void setTexture(TEXTURE, unsigned int *);
     glm::vec3 getV();
     glm::vec3 getA();
     glm::vec3 getLoc();
@@ -32,6 +39,7 @@ public:
     virtual ~object();
     virtual void draw(MATERIAL, float, float, float);
     virtual void draw(MATERIAL);
+    virtual void draw();
     virtual bool isCollide(object &);
 };
 

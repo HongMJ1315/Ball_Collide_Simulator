@@ -4,7 +4,7 @@
 #include "GLinclude.h"
 
 enum MATERIAL{
-    OBJECT, WALL, FLOOR
+    M_OBJECT, M_WALL, M_FLOOR, M_NONE
 };
 
 void SetMaterial(MATERIAL, float, float, float);

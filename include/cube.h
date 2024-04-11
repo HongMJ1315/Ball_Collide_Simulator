@@ -8,8 +8,10 @@ private:
     float l, w, h;
 public:
     cube(glm::vec3, float, float, float);
+    void draw(TEXTURE, unsigned int *);
     void draw(MATERIAL, float, float, float);
     void draw(MATERIAL);
+    void draw();
     bool isCollide(object &);
     float getL();
     float getW();

@@ -25,6 +25,18 @@ void ball::draw(MATERIAL m){
     glPopMatrix();
 }
 
+void ball::draw(){
+    SetMaterial(material, color.x, color.y, color.z);
+    if(textName != nullptr){
+        SetTexture(texture, textName);
+    }
+    glPushMatrix();
+    glTranslatef(object::getLoc().x, object::getLoc().y, object::getLoc().z);
+    glScalef(this->r, this->r, this->r);
+    glutSolidSphere(1, 20, 20);
+    glPopMatrix();
+}
+
 bool ball::isCollide(object &obj){
     cube *c = dynamic_cast<cube *>(&obj);
     if(c != nullptr){

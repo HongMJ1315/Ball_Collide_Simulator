@@ -5,7 +5,9 @@
 #include "ball.h"
 #include "object.h"
 #include "matrix.h"
-
+#include "texture.h"
+#include "glsl.h"
+#include "kdtree.hpp"
 #include <vector>
 #include <string>
 #include <random>
@@ -15,6 +17,7 @@
 
 #define SUN_LIGHT GL_LIGHT0
 
+void initTexture();
 void initObjects(std::vector<object *> &);
 void glInit();
 void drawCoordinateString(glm::vec3, glm::vec3, int, int, float, int);
