@@ -1,4 +1,5 @@
 #include "draw.h"
+#include <algorithm>
 #define BOX_SIZE 21
 
 
@@ -255,8 +256,8 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){
 
 void updatePhysics(float dt, std::vector<object *> &objs){
     if(!phyActive) return;
-    for(int i = 1; i < objs.size(); i++){
-        for(int j = i + 1; j < objs.size(); j++){
+    for(int i = 1; i <= 5; i++){
+        for(int j = 6; j < objs.size(); j++){
             if(objs[i]->isCollide(*(objs[j]))){
                 cube *c = dynamic_cast<cube *>(objs[i]);
                 if(c != nullptr && c->getName() == "Wall"){
@@ -319,33 +320,87 @@ void updatePhysics(float dt, std::vector<object *> &objs){
                     }
                     continue;
                 }
-                ball *b1 = (dynamic_cast<ball *>(objs[i]));
-                ball *b2 = (dynamic_cast<ball *>(objs[j]));
-                if(b1 == nullptr || b2 == nullptr) continue;
-                glm::vec3 v1 = objs[i]->getV();
-                glm::vec3 v2 = objs[j]->getV();
-                glm::vec3 loc1 = objs[i]->getLoc();
-                glm::vec3 loc2 = objs[j]->getLoc();
-                float m1 = objs[i]->getM();
-                float m2 = objs[j]->getM();
-                glm::vec3 diff_loc = loc1 - loc2;
-                //v1' = v1 - ((2 * m2 / (m1 + m2)) * (v1 - v2) * (loc1 - loc2) / |loc1 - loc2|^2)*(loc1 - loc2)
-                glm::vec3 v1_after = v1 - ((2 * m2 / (m1 + m2)) * glm::dot(v1 - v2, loc1 - loc2) / glm::dot(loc1 - loc2, loc1 - loc2)) * (loc1 - loc2);
-                glm::vec3 v2_after = v2 - ((2 * m1 / (m1 + m2)) * glm::dot(v2 - v1, loc2 - loc1) / glm::dot(loc2 - loc1, loc2 - loc1)) * (loc2 - loc1);
-                objs[i]->setV(v1_after);
-                objs[j]->setV(v2_after);
+                // ball *b1 = (dynamic_cast<ball *>(objs[i]));
+                // ball *b2 = (dynamic_cast<ball *>(objs[j]));
+                // if(b1 == nullptr || b2 == nullptr) continue;
+                // glm::vec3 v1 = objs[i]->getV();
+                // glm::vec3 v2 = objs[j]->getV();
+                // glm::vec3 loc1 = objs[i]->getLoc();
+                // glm::vec3 loc2 = objs[j]->getLoc();
+                // float m1 = objs[i]->getM();
+                // float m2 = objs[j]->getM();
+                // glm::vec3 diff_loc = loc1 - loc2;
+                // //v1' = v1 - ((2 * m2 / (m1 + m2)) * (v1 - v2) * (loc1 - loc2) / |loc1 - loc2|^2)*(loc1 - loc2)
+                // glm::vec3 v1_after = v1 - ((2 * m2 / (m1 + m2)) * glm::dot(v1 - v2, loc1 - loc2) / glm::dot(loc1 - loc2, loc1 - loc2)) * (loc1 - loc2);
+                // glm::vec3 v2_after = v2 - ((2 * m1 / (m1 + m2)) * glm::dot(v2 - v1, loc2 - loc1) / glm::dot(loc2 - loc1, loc2 - loc1)) * (loc2 - loc1);
+                // objs[i]->setV(v1_after);
+                // objs[j]->setV(v2_after);
 
-                glm::vec3 oloc1 = b1->getLoc();
-                glm::vec3 oloc2 = b2->getLoc();
-                glm::vec3 dirVec = oloc1 - oloc2;
-                if(glm::length(dirVec) < b1->getR() + b2->getR()){
-                    b1->setLoc(oloc1 + glm::normalize(dirVec) * (2 * b1->getR() - glm::length(dirVec)));
-                    b2->setLoc(oloc2 - glm::normalize(dirVec) * (2 * b2->getR() - glm::length(dirVec)));
-                }
-                b1->setColor(glm::vec3(0, 1, 0));
-                b2->setColor(glm::vec3(0, 1, 0));
+                // glm::vec3 oloc1 = b1->getLoc();
+                // glm::vec3 oloc2 = b2->getLoc();
+                // glm::vec3 dirVec = oloc1 - oloc2;
+                // if(glm::length(dirVec) < b1->getR() + b2->getR()){
+                //     b1->setLoc(oloc1 + glm::normalize(dirVec) * (2 * b1->getR() - glm::length(dirVec)));
+                //     b2->setLoc(oloc2 - glm::normalize(dirVec) * (2 * b2->getR() - glm::length(dirVec)));
+                // }
+                // b1->setColor(glm::vec3(0, 1, 0));
+                // b2->setColor(glm::vec3(0, 1, 0));
             }
         }
+    }
+    Kdtree::KdNodeVector nodes;
+    for(int i = 6; i < objs.size(); i++){
+        std::pair<int, std::vector<double>> p;
+        p.second.resize(3);
+        p.second[0] = objs[i]->getLoc().x;
+        p.second[1] = objs[i]->getLoc().y;
+        p.second[2] = objs[i]->getLoc().z;
+        p.first = i;
+        nodes.push_back(Kdtree::KdNode(p));
+    }
+    Kdtree::KdTree tree(&nodes);
+
+    for(int i = 6; i < objs.size(); i++){
+        std::pair<int, std::vector<double>> tp;
+        tp.second.resize(3);
+        tp.second[0] = objs[i]->getLoc().x;
+        tp.second[1] = objs[i]->getLoc().y;
+        tp.second[2] = objs[i]->getLoc().z;
+        Kdtree::KdNodeVector result;
+        tree.range_nearest_neighbors(tp, 0.6f, &result);
+        ball *b1 = (dynamic_cast<ball *>(objs[i]));
+        std::sort(result.begin(), result.end(), [](Kdtree::KdNode a, Kdtree::KdNode b){
+            return a.point.first < b.point.first;
+        });
+        for(auto j : result){
+            if(i <= j.point.first) continue;
+            // std::cout << i << " " << j.point.first << std::endl;
+            ball *b2 = (dynamic_cast<ball *>(objs[j.point.first]));
+            if(b1 == nullptr || b2 == nullptr) continue;
+            glm::vec3 v1 = b1->getV();
+            glm::vec3 v2 = b2->getV();
+            glm::vec3 loc1 = b1->getLoc();
+            glm::vec3 loc2 = b2->getLoc();
+            float m1 = b1->getM();
+            float m2 = b2->getM();
+            glm::vec3 diff_loc = loc1 - loc2;
+            //v1' = v1 - ((2 * m2 / (m1 + m2)) * (v1 - v2) * (loc1 - loc2) / |loc1 - loc2|^2)*(loc1 - loc2)
+            glm::vec3 v1_after = v1 - ((2 * m2 / (m1 + m2)) * glm::dot(v1 - v2, loc1 - loc2) / glm::dot(loc1 - loc2, loc1 - loc2)) * (loc1 - loc2);
+            glm::vec3 v2_after = v2 - ((2 * m1 / (m1 + m2)) * glm::dot(v2 - v1, loc2 - loc1) / glm::dot(loc2 - loc1, loc2 - loc1)) * (loc2 - loc1);
+            b1->setV(v1_after);
+            b2->setV(v2_after);
+
+            glm::vec3 oloc1 = b1->getLoc();
+            glm::vec3 oloc2 = b2->getLoc();
+            glm::vec3 dirVec = oloc1 - oloc2;
+            if(glm::length(dirVec) < b1->getR() + b2->getR()){
+                b1->setLoc(oloc1 + glm::normalize(dirVec) * (2 * b1->getR() - glm::length(dirVec)));
+                b2->setLoc(oloc2 - glm::normalize(dirVec) * (2 * b2->getR() - glm::length(dirVec)));
+            }
+            b1->setColor(glm::vec3(0, 1, 0));
+            b2->setColor(glm::vec3(0, 1, 0));
+        }
+
     }
     for(auto &obj : objs){
         obj->update(dt / 2);

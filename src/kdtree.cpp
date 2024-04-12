@@ -23,7 +23,7 @@ class compare_dimension {
  public:
   compare_dimension(size_t dim) { d = dim; }
   bool operator()(const KdNode& p, const KdNode& q) {
-    return (p.point[d] < q.point[d]);
+    return (p.point.second[d] < q.point.second[d]); 
   }
   size_t d;
 };
@@ -82,15 +82,15 @@ class DistanceL0 : virtual public DistanceMeasure {
     size_t i;
     double dist, test;
     if (w) {
-      dist = (*w)[0] * fabs(p[0] - q[0]);
-      for (i = 1; i < p.size(); i++) {
-        test = (*w)[i] * fabs(p[i] - q[i]);
+      dist = (*w).second[0] * fabs(p.second[0] - q.second[0]);
+      for(i = 1; i < p.second.size(); i++){
+        test = (*w).second[i] * fabs(p.second[i] - q.second[i]);
         if (test > dist) dist = test;
       }
     } else {
-      dist = fabs(p[0] - q[0]);
-      for (i = 1; i < p.size(); i++) {
-        test = fabs(p[i] - q[i]);
+      dist = fabs(p.second[0] - q.second[0]);
+      for (i = 1; i < p.second.size(); i++) {
+        test = fabs(p.second[i] - q.second[i]);
         if (test > dist) dist = test;
       }
     }
@@ -98,7 +98,7 @@ class DistanceL0 : virtual public DistanceMeasure {
   }
   double coordinate_distance(double x, double y, size_t dim) {
     if (w)
-      return (*w)[dim] * fabs(x - y);
+      return (*w).second[dim] * fabs(x - y);
     else
       return fabs(x - y);
   }
@@ -121,15 +121,15 @@ class DistanceL1 : virtual public DistanceMeasure {
     size_t i;
     double dist = 0.0;
     if (w) {
-      for (i = 0; i < p.size(); i++) dist += (*w)[i] * fabs(p[i] - q[i]);
+      for(i = 0; i < p.second.size(); i++) dist += (*w).second[i] * fabs(p.second[i] - q.second[i]);
     } else {
-      for (i = 0; i < p.size(); i++) dist += fabs(p[i] - q[i]);
+      for(i = 0; i < p.second.size(); i++) dist += fabs(p.second[i] - q.second[i]);
     }
     return dist;
   }
   double coordinate_distance(double x, double y, size_t dim) {
     if (w)
-      return (*w)[dim] * fabs(x - y);
+      return (*w).second[dim] * fabs(x - y);
     else
       return fabs(x - y);
   }
@@ -152,16 +152,16 @@ class DistanceL2 : virtual public DistanceMeasure {
     size_t i;
     double dist = 0.0;
     if (w) {
-      for (i = 0; i < p.size(); i++)
-        dist += (*w)[i] * (p[i] - q[i]) * (p[i] - q[i]);
+      for(i = 0; i < p.second.size(); i++)
+        dist += (*w).second[i] * (p.second[i] - q.second[i]) * (p.second[i] - q.second[i]);
     } else {
-      for (i = 0; i < p.size(); i++) dist += (p[i] - q[i]) * (p[i] - q[i]);
+      for(i = 0; i < p.second.size(); i++) dist += (p.second[i] - q.second[i]) * (p.second[i] - q.second[i]);
     }
     return dist;
   }
   double coordinate_distance(double x, double y, size_t dim) {
     if (w)
-      return (*w)[dim] * (x - y) * (x - y);
+      return (*w).second[dim] * (x - y) * (x - y);
     else
       return (x - y) * (x - y);
   }
@@ -182,7 +182,7 @@ KdTree::KdTree(const KdNodeVector* nodes, int distance_type /*=2*/) {
   if (!nodes || nodes->empty())
     throw std::invalid_argument(
         "kdtree::KdTree(): argument nodes must not be empty");
-  dimension = nodes->begin()->point.size();
+  dimension = nodes->begin()->point.second.size();
   allnodes = *nodes;
   // initialize distance values
   distance = NULL;
@@ -193,9 +193,9 @@ KdTree::KdTree(const KdNodeVector* nodes, int distance_type /*=2*/) {
   upbound = nodes->begin()->point;
   for (i = 1; i < nodes->size(); i++) {
     for (j = 0; j < dimension; j++) {
-      val = allnodes[i].point[j];
-      if (lobound[j] > val) lobound[j] = val;
-      if (upbound[j] < val) upbound[j] = val;
+      val = allnodes[i].point.second[j];
+      if(lobound.second[j] > val) lobound.second[j] = val;
+      if(upbound.second[j] < val) upbound.second[j] = val;
     }
   }
   // build tree recursively
@@ -236,19 +236,19 @@ kdtree_node* KdTree::build_tree(size_t depth, size_t a, size_t b) {
     std::nth_element(allnodes.begin() + a, allnodes.begin() + m,
                      allnodes.begin() + b, compare_dimension(node->cutdim));
     node->point = allnodes[m].point;
-    cutval = allnodes[m].point[node->cutdim];
+    cutval = allnodes[m].point.second[node->cutdim];
     node->dataindex = m;
     if (m - a > 0) {
-      temp = upbound[node->cutdim];
-      upbound[node->cutdim] = cutval;
+      temp = upbound.second[node->cutdim];
+      upbound.second[node->cutdim] = cutval;
       node->loson = build_tree(depth + 1, a, m);
-      upbound[node->cutdim] = temp;
+      upbound.second[node->cutdim] = temp;
     }
     if (b - m > 1) {
-      temp = lobound[node->cutdim];
-      lobound[node->cutdim] = cutval;
+      temp = lobound.second[node->cutdim];
+      lobound.second[node->cutdim] = cutval;
       node->hison = build_tree(depth + 1, m + 1, b);
-      lobound[node->cutdim] = temp;
+      lobound.second[node->cutdim] = temp;
     }
   }
   return node;
@@ -272,7 +272,7 @@ void KdTree::k_nearest_neighbors(const CoordPoint& point, size_t k,
 
   result->clear();
   if (k < 1) return;
-  if (point.size() != dimension)
+  if(point.second.size() != dimension)
     throw std::invalid_argument(
         "kdtree::k_nearest_neighbors(): point must be of same dimension as "
         "kdtree");
@@ -321,7 +321,7 @@ void KdTree::range_nearest_neighbors(const CoordPoint& point, double r,
   KdNode temp;
 
   result->clear();
-  if (point.size() != dimension)
+  if(point.second.size() != dimension)
     throw std::invalid_argument(
         "kdtree::k_nearest_neighbors(): point must be of same dimension as "
         "kdtree");
@@ -364,7 +364,7 @@ bool KdTree::neighbor_search(const CoordPoint& point, kdtree_node* node,
     }
   }
   // first search on side closer to point
-  if (point[node->cutdim] < node->point[node->cutdim]) {
+  if(point.second[node->cutdim] < node->point.second[node->cutdim]){
     if (node->loson)
       if (neighbor_search(point, node->loson, k, neighborheap)) return true;
   } else {
@@ -377,7 +377,7 @@ bool KdTree::neighbor_search(const CoordPoint& point, kdtree_node* node,
   } else {
     dist = neighborheap->top().distance;
   }
-  if (point[node->cutdim] < node->point[node->cutdim]) {
+  if(point.second[node->cutdim] < node->point.second[node->cutdim]){
     if (node->hison && bounds_overlap_ball(point, dist, node->hison))
       if (neighbor_search(point, node->hison, k, neighborheap)) return true;
   } else {
@@ -415,11 +415,12 @@ bool KdTree::bounds_overlap_ball(const CoordPoint& point, double dist,
     double distsum = 0.0;
     size_t i;
     for (i = 0; i < dimension; i++) {
-      if (point[i] < node->lobound[i]) {  // lower than low boundary
-        distsum += distance->coordinate_distance(point[i], node->lobound[i], i);
+      if(point.second[i] < node->lobound.second[i]){  // lower than low boundary
+        distsum += distance->coordinate_distance(point.second[i], node->lobound.second[i], i);
         if (distsum > dist) return false;
-      } else if (point[i] > node->upbound[i]) {  // higher than high boundary
-        distsum += distance->coordinate_distance(point[i], node->upbound[i], i);
+      }
+      else if(point.second[i] > node->upbound.second[i]){  // higher than high boundary
+        distsum += distance->coordinate_distance(point.second[i], node->upbound.second[i], i);
         if (distsum > dist) return false;
       }
     }
@@ -429,10 +430,11 @@ bool KdTree::bounds_overlap_ball(const CoordPoint& point, double dist,
     double curr_dist = 0.0;
     size_t i;
     for (i = 0; i < dimension; i++) {
-      if (point[i] < node->lobound[i]) {  // lower than low boundary
-        curr_dist = distance->coordinate_distance(point[i], node->lobound[i], i);
-      } else if (point[i] > node->upbound[i]) {  // higher than high boundary
-        curr_dist = distance->coordinate_distance(point[i], node->upbound[i], i);
+      if(point.second[i] < node->lobound.second[i]){  // lower than low boundary
+        curr_dist = distance->coordinate_distance(point.second[i], node->lobound.second[i], i);
+      }
+      else if(point.second[i] > node->upbound.second[i]){  // higher than high boundary
+        curr_dist = distance->coordinate_distance(point.second[i], node->upbound.second[i], i);
       }
       if(curr_dist > max_dist) {
         max_dist = curr_dist;
@@ -449,8 +451,8 @@ bool KdTree::ball_within_bounds(const CoordPoint& point, double dist,
                                 kdtree_node* node) {
   size_t i;
   for (i = 0; i < dimension; i++)
-    if (distance->coordinate_distance(point[i], node->lobound[i], i) <= dist ||
-        distance->coordinate_distance(point[i], node->upbound[i], i) <= dist)
+    if (distance->coordinate_distance(point.second[i], node->lobound.second[i], i) <= dist ||
+        distance->coordinate_distance(point.second[i], node->upbound.second[i], i) <= dist)
       return false;
   return true;
 }

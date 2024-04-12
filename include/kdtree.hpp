@@ -17,8 +17,8 @@
 
 namespace Kdtree {
 
-typedef std::vector<double> CoordPoint;
-typedef std::vector<double> DoubleVector;
+typedef std::pair<int, std::vector<double>> CoordPoint;
+typedef std::pair<int, std::vector<double>> DoubleVector;
 
 // for passing points to the constructor of kdtree
 struct KdNode {
