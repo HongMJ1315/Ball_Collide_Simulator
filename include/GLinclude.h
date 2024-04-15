@@ -20,4 +20,8 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
+// IMGUI
+#include <imgui.h>
+#include <imgui_stdlib.h>
+
 #endif

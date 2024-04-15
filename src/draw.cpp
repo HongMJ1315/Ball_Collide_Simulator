@@ -8,6 +8,7 @@ int directionKey[4] = { 0 };
 bool phyActive = false;
 unsigned int textName[10];
 unsigned char floorText[TEXTURE_SIZE][TEXTURE_SIZE][4];
+int viewMode = 0;
 
 void initTexture(){
     glPixelStorei(GL_UNPACK_ALIGNMENT, 10);
@@ -26,7 +27,7 @@ void glInit(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     //smooth shading
-    glShadeModel(GL_SMOOTH);
+    // glShadeModel(GL_SMOOTH);
     // Set light (directional light, sun light, white light)
     GLfloat light_position[] = { 0.0, 0.0, -1.0, 0.0 };
     GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -39,7 +40,7 @@ void glInit(){
     glEnable(SUN_LIGHT);
 }
 
-void initObjects(std::vector<object *> &objs){
+void initObjects(std::vector<object *> &objs, int num){
     objs.push_back(new cube(glm::vec3(0, 0, 0), BOX_SIZE, 0.1, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.5f));
     objs.back()->setM(1e10);
@@ -48,22 +49,22 @@ void initObjects(std::vector<object *> &objs){
     objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, BOX_SIZE / 2 + 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
-    objs.back()->setName("Wall");
+    objs.back()->setName("RWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
     objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, -BOX_SIZE / 2 - 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
-    objs.back()->setName("Wall");
+    objs.back()->setName("LWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
     objs.push_back(new cube(glm::vec3(BOX_SIZE / 2 + 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
-    objs.back()->setName("Wall");
+    objs.back()->setName("FWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
     objs.push_back(new cube(glm::vec3(-BOX_SIZE / 2 - 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
-    objs.back()->setName("Wall");
+    objs.back()->setName("BWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
     objs.push_back(new cube(glm::vec3(0, 3, 0), 6, 6, 6));
     objs.back()->setColor(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -75,27 +76,43 @@ void initObjects(std::vector<object *> &objs){
     std::random_device rd;
     std::mt19937 gen(1234);
     // int K; std::cin >> K;
+    int K = num;
+    int count = 0;
 
-    for(int i = 1; i <= 20; i++){
-        for(int j = 0; j < 2; j++){
-            for(int k = 0; k < 4; k++){
+    for(int j = 0; count < K; j++){
+        for(int i = 1; i <= 20 && count < K; i++){
+            for(int k = 0; k < 4 && count < K; k++){
                 objs.push_back(new ball(glm::vec3(8 - k * 5, 10 + j, -BOX_SIZE / 2 - 0.5 + i), 0.3));
                 objs.back()->setColor(glm::vec3(1.0f, 0, 0));
-                objs.back()->setM(float(gen() % 5) + 1);
+                objs.back()->setM(1);
+                // objs.back()->setM(float(gen() % 5) + 1);
                 objs.back()->setMaterial(MATERIAL::M_OBJECT);
+                int rx = (gen() % 2) ? 1 : -1;
+                int ry = (gen() % 2) ? 1 : -1;
+                int rz = (gen() % 2) ? 1 : -1;
+                objs.back()->setV(glm::vec3(float(gen() % 10) * rx, float(gen() % 10) * ry, float(gen() % 10) * rz));
+                count++;
+
+                if(count >= K){
+                    break;
+                }
             }
         }
     }
-    for(int i = 0; i < 90; i++){
-        int x = gen() % 4;
-        int y = gen() % 5;
-        int z = gen() % 20 + 1;
-        objs.push_back(new ball(glm::vec3(8 - x * 5, 16 + y, -BOX_SIZE / 2 - 0.5 + z), 0.3));
-        objs.back()->setColor(glm::vec3(1.0f, 0, 0));
-        objs.back()->setV(glm::vec3(float(gen() % 10), float(gen() % 10), float(gen() % 10)));
-        objs.back()->setM(float(gen() % 5) + 1);
-        objs.back()->setMaterial(MATERIAL::M_OBJECT);
-    }
+
+    // for(int i = 0; i < num - K; i++){
+    //     int x = gen() % 4;
+    //     int y = gen() % 5;
+    //     int z = gen() % 20 + 1;
+    //     int rx = (gen() % 2) ? 1 : -1;
+    //     int ry = (gen() % 2) ? 1 : -1;
+    //     int rz = (gen() % 2) ? 1 : -1;
+    //     objs.push_back(new ball(glm::vec3(8 - x * 5, 16 + y, -BOX_SIZE / 2 - 0.5 + z), 0.3));
+    //     objs.back()->setColor(glm::vec3(1.0f, 0, 0));
+    //     objs.back()->setV(glm::vec3(float(gen() % 10) * rx, float(gen() % 10) * ry, float(gen() % 10) * rz));
+    //     objs.back()->setM(float(gen() % 5) + 1);
+    //     objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    // }
 }
 
 void move(float dx, float dy, float dz, glm::vec3 &frontPos, glm::vec3 &cameraPos){
@@ -160,9 +177,11 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
     std::string cameraPosSt = "Camera Position: (" + std::to_string(cameraPos.x) + ", " + std::to_string(cameraPos.y) + ", " + std::to_string(cameraPos.z) + ")";
     std::string frontPosSt = "Front Position: (" + std::to_string(frontPos.x) + ", " + std::to_string(frontPos.y) + ", " + std::to_string(frontPos.z) + ")";
     std::string dtFpsSt = "dt: " + std::to_string(dt) + " fps: " + std::to_string(fps);
+    glLoadIdentity();
     glMatrixMode(GL_PROJECTION);
     glDisable(GL_LIGHTING);
     glPushMatrix();
+    glViewport(0, 0, width, height);
     gluOrtho2D(0, width, 0, height);
     glMatrixMode(GL_MODELVIEW);
     SetMaterial(MATERIAL::M_OBJECT, 0.0f, 1.0f, 0.0f);
@@ -186,6 +205,70 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
     glMatrixMode(GL_MODELVIEW);
 }
 
+void drawSingleView(std::vector<object *> &objs, int width, int height, glm::vec3 &cameraPos, glm::vec3 &frontPos){
+
+    glViewport(0, 0, width, height);
+    glEnable(GL_DEPTH_TEST);
+    glClearDepth(1.0);
+    glEnable(GL_LIGHTING);
+    gluPerspective(60.0f, (float) width / (float) height, 0.1f, 10000.0f);
+    gluLookAt(cameraPos.x, cameraPos.y, cameraPos.z, frontPos.x, frontPos.y, frontPos.z, 0.0f, 1.0f, 0.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+    for(auto &obj : objs){
+        obj->draw();
+    }
+}
+
+void drawMultiView(std::vector<object *> &objs, int width, int height, glm::vec3 &cameraPos, glm::vec3 &frontPos){
+    int viewportWidth = width / 2;
+    int viewportHeight = height / 2;
+
+    glEnable(GL_DEPTH_TEST);
+    glClearDepth(1.0);
+    glEnable(GL_LIGHTING);
+
+    // Top Left View 
+    glLoadIdentity();
+    glViewport(0, height / 2, viewportWidth, viewportHeight);
+    gluPerspective(60.0f, (float) width / (float) height, 0.1f, 10000.0f);
+    gluLookAt(cameraPos.x, cameraPos.y, cameraPos.z, frontPos.x, frontPos.y, frontPos.z, 0.0f, 1.0f, 0.0f);
+    for(auto &obj : objs){
+        obj->draw();
+    }
+
+    // Top Right View
+    glLoadIdentity();
+    glViewport(width / 2, height / 2, viewportWidth, viewportHeight);
+    glOrtho(-width / 50, width / 50, -height / 50, height / 50, -1000, 1000);
+    gluLookAt(0 - 1, 0, 0, 0, 0, 0, 0.0f, 1.0f, 0.0f);
+    for(auto &obj : objs){
+        if(obj->getName() == "BWall") continue;
+        obj->draw();
+    }
+
+    // Bottom Left View
+    glLoadIdentity();
+    glViewport(0, 0, viewportWidth, viewportHeight);
+    glOrtho(-width / 50, width / 50, -height / 50, height / 50, -1000, 1000);
+    gluLookAt(0, 0, 0 - 1, 0, 0, 0, 0.0f, 1.0f, 0.0f);
+    for(auto &obj : objs){
+        if(obj->getName() == "LWall") continue;
+        obj->draw();
+    }
+
+    // Bottom Right View
+    glLoadIdentity();
+    glViewport(width / 2, 0, viewportWidth, viewportHeight);
+    glOrtho(-width / 50, width / 50, -height / 50, height / 50, -1000, 1000);
+    gluLookAt(0 - 0.001f, 0 + 1, 0, 0, 0, 0, 0.0f, 1.0f, 0.0f);
+    for(auto &obj : objs){
+        obj->draw();
+    }
+}
+
+
+
 void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::vec3 &cameraPos, glm::vec3 &frontPos, std::vector<object *> &objs){
     // glUseProgram(ReturnProgramID());
 
@@ -193,21 +276,13 @@ void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::
     glLoadIdentity();
     drawCoordinateString(cameraPos, frontPos, width, height, dt, fps);
 
-    glViewport(0, 0, width, height);
-    gluPerspective(60.0f, (float) width / (float) height, 0.1f, 10000.0f);
-    glEnable(GL_DEPTH_TEST);
-    glClearDepth(1.0);
-    glEnable(GL_LIGHTING);
-    gluLookAt(cameraPos.x, cameraPos.y, cameraPos.z, frontPos.x, frontPos.y, frontPos.z, 0.0f, 1.0f, 0.0f);
-
-    glMatrixMode(GL_MODELVIEW);
-    for(auto &obj : objs){
-        obj->draw();
-    }
+    if(viewMode == 0)
+        drawSingleView(objs, width, height, cameraPos, frontPos);
+    else if(viewMode == 1)
+        drawMultiView(objs, width, height, cameraPos, frontPos);
     glfwSwapBuffers(window);
     GLenum error = glGetError();
     if(error != GL_NO_ERROR){
-        // 在這裡處理錯誤，例如輸出錯誤信息
         std::cerr << "OpenGL error: " << gluErrorString(error) << std::endl;
     }
 }
@@ -218,6 +293,9 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){
         keyState[key] = true;
         if(key == GLFW_KEY_P){
             phyActive = !phyActive;
+        }
+        if(key == GLFW_KEY_V){
+            viewMode = (viewMode + 1) % 2;
         }
         switch(key){
             case GLFW_KEY_UP:
@@ -260,7 +338,10 @@ void updatePhysics(float dt, std::vector<object *> &objs){
         for(int j = 6; j < objs.size(); j++){
             if(objs[i]->isCollide(*(objs[j]))){
                 cube *c = dynamic_cast<cube *>(objs[i]);
-                if(c != nullptr && c->getName() == "Wall"){
+                if(c != nullptr && (c->getName() == "BWall" ||
+                    c->getName() == "RWall" ||
+                    c->getName() == "LWall" ||
+                    c->getName() == "FWall")){
                     ball *b = dynamic_cast<ball *>(objs[j]);
                     if(b != nullptr){
                         float cl = c->getL() / 2;
