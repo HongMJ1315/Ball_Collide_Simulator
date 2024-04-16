@@ -26,10 +26,11 @@ void ball::draw(MATERIAL m){
 }
 
 void ball::draw(){
-    SetMaterial(material, color.x, color.y, color.z);
     if(textName != nullptr){
         SetTexture(texture, textName);
     }
+    else
+        SetMaterial(material, color.x, color.y, color.z);
     glPushMatrix();
     glTranslatef(object::getLoc().x, object::getLoc().y, object::getLoc().z);
     glScalef(this->r, this->r, this->r);

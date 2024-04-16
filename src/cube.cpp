@@ -74,10 +74,11 @@ void cube::draw(MATERIAL m){
 }
 
 void cube::draw(){
-    SetMaterial(material, color.x, color.y, color.z);
     if(textName != nullptr){
         SetTexture(texture, textName);
     }
+    else
+        SetMaterial(material, color.x, color.y, color.z);
 
     glPushMatrix();
     glTranslatef(loc.x, loc.y, loc.z);

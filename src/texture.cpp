@@ -30,9 +30,9 @@ void TextureInit(TEXTURE textType, unsigned int *textName, unsigned char texture
 }
 
 void SetTexture(TEXTURE textType, unsigned int *textName){
-    float diffuse[] = { 0.3, 0.3, 0.3, 1.0 };
+    float diffuse[] = { 0.5, 0.5, 0.5, 1.0 };
     float specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    float ambient[] = { 0.3, 0.3, 0.3, 1.0 };
+    float ambient[] = { 0.5, 0.5, 0.5, 1.0 };
     float emission[] = { 0.0, 0.0, 0.0, 1.0 };
     float shininess = 0.0;
     glEnable(GL_TEXTURE_2D);
@@ -41,13 +41,13 @@ void SetTexture(TEXTURE textType, unsigned int *textName){
 
     switch(textType){
         case T_OBJECT:
-        shininess = 30;
-        specular[0] = 0.708273; specular[1] = 0.708273; specular[2] = 0.308273;
+        shininess = 2;
+        specular[0] = 0.1; specular[1] = 0.1; specular[2] = 0.1;
         break;
 
         case T_FLOOR: case T_WALL:
-        shininess = 0.1;
-        specular[0] = 0.4; specular[1] = 0.2; specular[2] = 0.0;
+        shininess = 1;
+        specular[0] = 0.05; specular[1] = 0.05; specular[2] = 0.05;
         break;
 
         default:

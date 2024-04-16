@@ -8,13 +8,19 @@ int directionKey[4] = { 0 };
 bool phyActive = false;
 unsigned int textName[10];
 unsigned char floorText[TEXTURE_SIZE][TEXTURE_SIZE][4];
+unsigned char emptyText[TEXTURE_SIZE][TEXTURE_SIZE][4];
 int viewMode = 0;
 
 void initTexture(){
+    for(int i = 0; i < TEXTURE_SIZE; i++)
+        for(int j = 0; j < TEXTURE_SIZE; j++)
+            emptyText[i][j][0] = emptyText[i][j][1] =
+            emptyText[i][j][2] = emptyText[i][j][3] = 255;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 10);
     glGenTextures(10, textName);
     GenerateTexture(floorText);
     TextureInit(TEXTURE::T_FLOOR, textName, floorText, TEXTURE_SIZE, TEXTURE_SIZE);
+    TextureInit(TEXTURE::T_WALL, textName, emptyText, TEXTURE_SIZE, TEXTURE_SIZE);
 }
 void glInit(){
     // setGLSLshaders("shader/Phong.vert", "shader/Phong.frag");
@@ -27,9 +33,10 @@ void glInit(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     //smooth shading
-    // glShadeModel(GL_SMOOTH);
+    glShadeModel(GL_SMOOTH);
     // Set light (directional light, sun light, white light)
-    GLfloat light_position[] = { 0.0, 0.0, -1.0, 0.0 };
+    glEnable(SUN_LIGHT);
+    GLfloat light_position[] = { 0.0, 1.0, 0.0, 0.0 };
     GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat light_diffuse[] = { 0.8, 0.8, 0.8, 1.0 };     // Diffuse light color (RGBA)
     GLfloat light_specular[] = { 0.8, 0.8, 0.8, 1.0 };    // Specular light color (RGBA)
@@ -37,7 +44,6 @@ void glInit(){
     glLightfv(SUN_LIGHT, GL_AMBIENT, light_ambient);
     glLightfv(SUN_LIGHT, GL_DIFFUSE, light_diffuse);
     glLightfv(SUN_LIGHT, GL_SPECULAR, light_specular);
-    glEnable(SUN_LIGHT);
 }
 
 void initObjects(std::vector<object *> &objs, int num){
@@ -51,26 +57,31 @@ void initObjects(std::vector<object *> &objs, int num){
     objs.back()->setM(1e10);
     objs.back()->setName("RWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, -BOX_SIZE / 2 - 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
     objs.back()->setName("LWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(BOX_SIZE / 2 + 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("FWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(-BOX_SIZE / 2 - 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("BWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(0, 3, 0), 6, 6, 6));
     objs.back()->setColor(glm::vec3(1.0f, 1.0f, 1.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("Cube");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    // objs.back()->setTexture(TEXTURE::T_WALL, textName);
 
 
     std::random_device rd;
@@ -177,16 +188,16 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
     std::string cameraPosSt = "Camera Position: (" + std::to_string(cameraPos.x) + ", " + std::to_string(cameraPos.y) + ", " + std::to_string(cameraPos.z) + ")";
     std::string frontPosSt = "Front Position: (" + std::to_string(frontPos.x) + ", " + std::to_string(frontPos.y) + ", " + std::to_string(frontPos.z) + ")";
     std::string dtFpsSt = "dt: " + std::to_string(dt) + " fps: " + std::to_string(fps);
-    glLoadIdentity();
     glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
     glDisable(GL_LIGHTING);
     glPushMatrix();
     glViewport(0, 0, width, height);
     gluOrtho2D(0, width, 0, height);
     glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     SetMaterial(MATERIAL::M_OBJECT, 0.0f, 1.0f, 0.0f);
     glPushMatrix();
-    glLoadIdentity();
     glRasterPos2f(10, height - 30);
     for(int i = 0; i < cameraPosSt.length(); i++){
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, cameraPosSt[i]);
@@ -206,7 +217,8 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
 }
 
 void drawSingleView(std::vector<object *> &objs, int width, int height, glm::vec3 &cameraPos, glm::vec3 &frontPos){
-
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
     glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
     glClearDepth(1.0);
@@ -228,6 +240,7 @@ void drawMultiView(std::vector<object *> &objs, int width, int height, glm::vec3
     glClearDepth(1.0);
     glEnable(GL_LIGHTING);
 
+    glMatrixMode(GL_PROJECTION);
     // Top Left View 
     glLoadIdentity();
     glViewport(0, height / 2, viewportWidth, viewportHeight);
@@ -334,7 +347,7 @@ void keyboard(GLFWwindow *window, int key, int scancode, int action, int mods){
 
 void updatePhysics(float dt, std::vector<object *> &objs){
     if(!phyActive) return;
-    for(int i = 1; i <= 5; i++){
+    for(int i = 1; i < 6; i++){
         for(int j = 6; j < objs.size(); j++){
             if(objs[i]->isCollide(*(objs[j]))){
                 cube *c = dynamic_cast<cube *>(objs[i]);
@@ -401,34 +414,37 @@ void updatePhysics(float dt, std::vector<object *> &objs){
                     }
                     continue;
                 }
-                // ball *b1 = (dynamic_cast<ball *>(objs[i]));
-                // ball *b2 = (dynamic_cast<ball *>(objs[j]));
-                // if(b1 == nullptr || b2 == nullptr) continue;
-                // glm::vec3 v1 = objs[i]->getV();
-                // glm::vec3 v2 = objs[j]->getV();
-                // glm::vec3 loc1 = objs[i]->getLoc();
-                // glm::vec3 loc2 = objs[j]->getLoc();
-                // float m1 = objs[i]->getM();
-                // float m2 = objs[j]->getM();
-                // glm::vec3 diff_loc = loc1 - loc2;
-                // //v1' = v1 - ((2 * m2 / (m1 + m2)) * (v1 - v2) * (loc1 - loc2) / |loc1 - loc2|^2)*(loc1 - loc2)
-                // glm::vec3 v1_after = v1 - ((2 * m2 / (m1 + m2)) * glm::dot(v1 - v2, loc1 - loc2) / glm::dot(loc1 - loc2, loc1 - loc2)) * (loc1 - loc2);
-                // glm::vec3 v2_after = v2 - ((2 * m1 / (m1 + m2)) * glm::dot(v2 - v1, loc2 - loc1) / glm::dot(loc2 - loc1, loc2 - loc1)) * (loc2 - loc1);
-                // objs[i]->setV(v1_after);
-                // objs[j]->setV(v2_after);
+                /*
+                ball *b1 = (dynamic_cast<ball *>(objs[i]));
+                ball *b2 = (dynamic_cast<ball *>(objs[j]));
+                if(b1 == nullptr || b2 == nullptr) continue;
+                glm::vec3 v1 = b1->getV();
+                glm::vec3 v2 = b2->getV();
+                glm::vec3 loc1 = b1->getLoc();
+                glm::vec3 loc2 = b2->getLoc();
+                float m1 = b1->getM();
+                float m2 = b2->getM();
+                glm::vec3 diff_loc = loc1 - loc2;
+                //v1' = v1 - ((2 * m2 / (m1 + m2)) * (v1 - v2) * (loc1 - loc2) / |loc1 - loc2|^2)*(loc1 - loc2)
+                glm::vec3 v1_after = v1 - ((2 * m2 / (m1 + m2)) * glm::dot(v1 - v2, loc1 - loc2) / glm::dot(loc1 - loc2, loc1 - loc2)) * (loc1 - loc2);
+                glm::vec3 v2_after = v2 - ((2 * m1 / (m1 + m2)) * glm::dot(v2 - v1, loc2 - loc1) / glm::dot(loc2 - loc1, loc2 - loc1)) * (loc2 - loc1);
+                b1->setV(v1_after);
+                b2->setV(v2_after);
 
-                // glm::vec3 oloc1 = b1->getLoc();
-                // glm::vec3 oloc2 = b2->getLoc();
-                // glm::vec3 dirVec = oloc1 - oloc2;
-                // if(glm::length(dirVec) < b1->getR() + b2->getR()){
-                //     b1->setLoc(oloc1 + glm::normalize(dirVec) * (2 * b1->getR() - glm::length(dirVec)));
-                //     b2->setLoc(oloc2 - glm::normalize(dirVec) * (2 * b2->getR() - glm::length(dirVec)));
-                // }
-                // b1->setColor(glm::vec3(0, 1, 0));
-                // b2->setColor(glm::vec3(0, 1, 0));
+                glm::vec3 oloc1 = b1->getLoc();
+                glm::vec3 oloc2 = b2->getLoc();
+                glm::vec3 dirVec = oloc1 - oloc2;
+                if(glm::length(dirVec) < b1->getR() + b2->getR()){
+                    b1->setLoc(oloc1 + glm::normalize(dirVec) * (2 * b1->getR() - glm::length(dirVec)));
+                    b2->setLoc(oloc2 - glm::normalize(dirVec) * (2 * b2->getR() - glm::length(dirVec)));
+                }
+                b1->setColor(glm::vec3(0, 1, 0));
+                b2->setColor(glm::vec3(0, 1, 0));
+                // */
             }
         }
     }
+    // /*
     Kdtree::KdNodeVector nodes;
     for(int i = 6; i < objs.size(); i++){
         std::pair<int, std::vector<double>> p;
@@ -483,6 +499,7 @@ void updatePhysics(float dt, std::vector<object *> &objs){
         }
 
     }
+    // */
     for(auto &obj : objs){
         obj->update(dt / 2);
     }
