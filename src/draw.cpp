@@ -20,25 +20,25 @@ void initTexture(){
     glGenTextures(10, textName);
     GenerateTexture(floorText);
     TextureInit(TEXTURE::T_FLOOR, textName, floorText, TEXTURE_SIZE, TEXTURE_SIZE);
-    TextureInit(TEXTURE::T_WALL, textName, emptyText, TEXTURE_SIZE, TEXTURE_SIZE);
-}
-void glInit(){
+    // TextureInit(TEXTURE::T_WALL, textName, emptyText, TEXTURE_SIZE, TEXTURE_SIZE);
     setGLSLshaders("shader/Phong.vert", "shader/Phong.frag");
     int texLoc = glGetUniformLocation(ReturnProgramID(), "myTex");
     // std::cout << texLoc << std::endl;
     glUniform1i(texLoc, 0);
-
-
+}
+void glInit(){
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     //smooth shading
     glShadeModel(GL_SMOOTH);
-    // Set light (directional light, sun light, white light)
+}
+
+void setLight(){
     glEnable(SUN_LIGHT);
-    GLfloat light_position[] = { 0.0, 1.0, 0.0, 0.0 };
-    GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat light_diffuse[] = { 0.8, 0.8, 0.8, 1.0 };     // Diffuse light color (RGBA)
+    GLfloat light_position[] = { 0.0, -1.0, 0.0, 0.0 };
+    GLfloat light_ambient[] = { 0.7, 0.7, 0.7, 1.0 };
+    GLfloat light_diffuse[] = { 0.1, 0.1, 0.1, 1.0 };     // Diffuse light color (RGBA)
     GLfloat light_specular[] = { 0.8, 0.8, 0.8, 1.0 };    // Specular light color (RGBA)
     glLightfv(SUN_LIGHT, GL_POSITION, light_position);
     glLightfv(SUN_LIGHT, GL_AMBIENT, light_ambient);
@@ -47,17 +47,19 @@ void glInit(){
 }
 
 void initObjects(std::vector<object *> &objs, int num){
-    objs.push_back(new cube(glm::vec3(0, 0, 0), BOX_SIZE, 0.1, BOX_SIZE));
-    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.5f));
+    objs.push_back(new cube(glm::vec3(0, 0, 0), BOX_SIZE, 0.5, BOX_SIZE));
+    objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("Ground");
+    objs.back()->setMaterial(MATERIAL::M_OBJECT);
     objs.back()->setTexture(TEXTURE::T_FLOOR, textName);
+    // /*
     objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, BOX_SIZE / 2 + 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
     objs.back()->setName("RWall");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
-    // objs.back()->setTexture(TEXTURE::T_FLOOR, textName);
+    // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, -BOX_SIZE / 2 - 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
@@ -81,7 +83,7 @@ void initObjects(std::vector<object *> &objs, int num){
     objs.back()->setM(1e10);
     objs.back()->setName("Cube");
     objs.back()->setMaterial(MATERIAL::M_OBJECT);
-    // objs.back()->setTexture(TEXTURE::T_WALL, textName);
+    // objs.back()->setTexture(TEXTURE::T_FLOOR, textName);
 
     std::random_device rd;
     std::mt19937 gen(1234);
@@ -112,19 +114,20 @@ void initObjects(std::vector<object *> &objs, int num){
     }
     // */
 
-        // for(int i = 0; i < num - K; i++){
-        //     int x = gen() % 4;
-        //     int y = gen() % 5;
-        //     int z = gen() % 20 + 1;
-        //     int rx = (gen() % 2) ? 1 : -1;
-        //     int ry = (gen() % 2) ? 1 : -1;
-        //     int rz = (gen() % 2) ? 1 : -1;
-        //     objs.push_back(new ball(glm::vec3(8 - x * 5, 16 + y, -BOX_SIZE / 2 - 0.5 + z), 0.3));
-        //     objs.back()->setColor(glm::vec3(1.0f, 0, 0));
-        //     objs.back()->setV(glm::vec3(float(gen() % 10) * rx, float(gen() % 10) * ry, float(gen() % 10) * rz));
-        //     objs.back()->setM(float(gen() % 5) + 1);
-        //     objs.back()->setMaterial(MATERIAL::M_OBJECT);
-        // }
+    // for(int i = 0; i < num - K; i++){
+    //     int x = gen() % 4;
+    //     int y = gen() % 5;
+    //     int z = gen() % 20 + 1;
+    //     int rx = (gen() % 2) ? 1 : -1;
+    //     int ry = (gen() % 2) ? 1 : -1;
+    //     int rz = (gen() % 2) ? 1 : -1;
+    //     objs.push_back(new ball(glm::vec3(8 - x * 5, 16 + y, -BOX_SIZE / 2 - 0.5 + z), 0.3));
+    //     objs.back()->setColor(glm::vec3(1.0f, 0, 0));
+    //     objs.back()->setV(glm::vec3(float(gen() % 10) * rx, float(gen() % 10) * ry, float(gen() % 10) * rz));
+    //     objs.back()->setM(float(gen() % 5) + 1);
+    //     objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    // }
+// */
 }
 
 void move(float dx, float dy, float dz, glm::vec3 &frontPos, glm::vec3 &cameraPos){
@@ -229,6 +232,7 @@ void drawSingleView(std::vector<object *> &objs, int width, int height, glm::vec
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    setLight();
     for(auto &obj : objs){
         obj->draw();
     }
@@ -248,6 +252,7 @@ void drawMultiView(std::vector<object *> &objs, int width, int height, glm::vec3
     glViewport(0, height / 2, viewportWidth, viewportHeight);
     gluPerspective(60.0f, (float) width / (float) height, 0.1f, 10000.0f);
     gluLookAt(cameraPos.x, cameraPos.y, cameraPos.z, frontPos.x, frontPos.y, frontPos.z, 0.0f, 1.0f, 0.0f);
+    setLight();
     for(auto &obj : objs){
         obj->draw();
     }
@@ -257,6 +262,7 @@ void drawMultiView(std::vector<object *> &objs, int width, int height, glm::vec3
     glViewport(width / 2, height / 2, viewportWidth, viewportHeight);
     glOrtho(-width / 50, width / 50, -height / 50, height / 50, -1000, 1000);
     gluLookAt(0 - 1, 0, 0, 0, 0, 0, 0.0f, 1.0f, 0.0f);
+    setLight();
     for(auto &obj : objs){
         if(obj->getName() == "BWall") continue;
         obj->draw();
@@ -267,6 +273,7 @@ void drawMultiView(std::vector<object *> &objs, int width, int height, glm::vec3
     glViewport(0, 0, viewportWidth, viewportHeight);
     glOrtho(-width / 50, width / 50, -height / 50, height / 50, -1000, 1000);
     gluLookAt(0, 0, 0 - 1, 0, 0, 0, 0.0f, 1.0f, 0.0f);
+    setLight();
     for(auto &obj : objs){
         if(obj->getName() == "LWall") continue;
         obj->draw();
@@ -277,6 +284,7 @@ void drawMultiView(std::vector<object *> &objs, int width, int height, glm::vec3
     glViewport(width / 2, 0, viewportWidth, viewportHeight);
     glOrtho(-width / 50, width / 50, -height / 50, height / 50, -1000, 1000);
     gluLookAt(0 - 0.001f, 0 + 1, 0, 0, 0, 0, 0.0f, 1.0f, 0.0f);
+    setLight();
     for(auto &obj : objs){
         obj->draw();
     }
@@ -285,10 +293,11 @@ void drawMultiView(std::vector<object *> &objs, int width, int height, glm::vec3
 
 
 void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::vec3 &cameraPos, glm::vec3 &frontPos, std::vector<object *> &objs){
-    // glUseProgram(ReturnProgramID());
-    glUseProgram(0);
+    glUseProgram(ReturnProgramID());
+    // glUseProgram(0);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     drawCoordinateString(cameraPos, frontPos, width, height, dt, fps);
 

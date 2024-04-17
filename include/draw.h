@@ -28,5 +28,5 @@ void drawMultiView(std::vector<object *> &, int, int, glm::vec3 &, glm::vec3 &);
 void display(GLFWwindow *, int, int, float, int, glm::vec3 &, glm::vec3 &, std::vector<object *> &);
 void keyboard(GLFWwindow *, int, int, int, int);
 void updatePhysics(float, std::vector<object *> &);
-
+void setLight();
 #endif

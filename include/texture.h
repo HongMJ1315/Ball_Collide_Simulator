@@ -3,7 +3,7 @@
 
 #define TEXTURE_SIZE 256
 enum TEXTURE{
-    T_OBJECT, T_WALL, T_FLOOR, T_NONE
+    T_FLOOR, T_OBJECT, T_WALL, T_NONE
 };
 
 void GenerateTexture(unsigned char[TEXTURE_SIZE][TEXTURE_SIZE][4]);

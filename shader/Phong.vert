@@ -1,0 +1,20 @@
+//Vertex shader for Phong shading + texture mapping
+varying vec3 N; //normal vector
+varying vec3 E; //V vector for specular.
+varying vec3 FP; //fragment position
+varying vec3 L; // Light direction
+
+void main()
+{
+   vec4 eyePosition = gl_ModelViewMatrix*gl_Vertex;
+   vec4 eyeLightPos = gl_ModelViewMatrix*gl_LightSource[0].position;
+
+   N =  normalize(gl_NormalMatrix*gl_Normal);
+   E = -eyePosition.xyz;
+//    L = normalize(eyeLightPos.xyz - eyePosition.xyz); // Compute light direction
+   L = normalize(gl_LightSource[0].position.xyz); // Compute light direction
+
+   gl_TexCoord[0] = gl_MultiTexCoord0;
+   gl_Position = gl_ModelViewProjectionMatrix*gl_Vertex;
+   FP = gl_Position.xyz/gl_Position.w;
+}

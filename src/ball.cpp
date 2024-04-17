@@ -7,23 +7,7 @@ ball::ball(glm::vec3 loc, float r) :object(loc){
     this->r = r;
 }
 
-void ball::draw(MATERIAL m, float r, float g, float b){
-    SetMaterial(m, r, g, b);
-    glPushMatrix();
-    glTranslatef(object::getLoc().x, object::getLoc().y, object::getLoc().z);
-    glScalef(this->r, this->r, this->r);
-    glutSolidSphere(1, 20, 20);
-    glPopMatrix();
-}
 
-void ball::draw(MATERIAL m){
-    SetMaterial(m, color.x, color.y, color.z);
-    glPushMatrix();
-    glTranslatef(object::getLoc().x, object::getLoc().y, object::getLoc().z);
-    glScalef(this->r, this->r, this->r);
-    glutSolidSphere(1, 20, 20);
-    glPopMatrix();
-}
 
 void ball::draw(){
     if(textName != nullptr){
