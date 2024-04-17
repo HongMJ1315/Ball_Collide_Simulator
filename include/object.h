@@ -15,7 +15,7 @@ protected:
     std::string name;
     MATERIAL material;
     TEXTURE texture;
-    unsigned int *textName;
+    unsigned int *textName = nullptr;
     float m;
 public:
     object(glm::vec3 loc, glm::vec3 v, glm::vec3 a, float m);
@@ -23,7 +23,9 @@ public:
     object(glm::vec3 loc);
     void update(float);
     void setV(glm::vec3);
+    void addV(glm::vec3);
     void setA(glm::vec3);
+    void addA(glm::vec3);
     void setLoc(glm::vec3);
     void setM(float);
     void setName(std::string);

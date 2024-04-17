@@ -110,3 +110,11 @@ void object::setTexture(TEXTURE t, unsigned int *textName){
     this->texture = t;
     this->textName = textName;
 }
+
+void object::addA(glm::vec3 a){
+    this->a += a;
+}
+
+void object::addV(glm::vec3 v){
+    this->v += v;
+}

@@ -50,7 +50,7 @@ int main(int argc, char **argv){
     }
     frontVec = glm::normalize(frontVec);
     frontPos = cameraPos + frontVec;
-    int total = 0;
+    int total = 250;
     std::cout << "Enter the number of objects: ";
     std::cin >> total;
     initTexture();
