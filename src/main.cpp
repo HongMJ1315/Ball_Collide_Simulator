@@ -10,8 +10,8 @@
 std::vector<object *> objs;
 
 int width = 1600, height = 1600 * 9 / 16;
-glm::vec3 cameraPos = glm::vec3(-28, 50, 0);
-glm::vec3 frontVec = glm::vec3(1, -1, 0);
+glm::vec3 cameraPos = glm::vec3(-10, 35, 0);
+glm::vec3 frontVec = glm::vec3(1, -2, 0);
 
 glm::vec3 frontPos /*= glm::vec3(0, 22, -5)*/;
 

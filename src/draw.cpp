@@ -36,11 +36,11 @@ void glInit(){
 
 void setLight(){
     glEnable(SUN_LIGHT);
-    GLfloat light_position[] = { 0.0, -1.0, 0.0, 0.0 };
-    GLfloat light_ambient[] = { 0.7, 0.7, 0.7, 1.0 };
-    GLfloat light_diffuse[] = { 0.1, 0.1, 0.1, 1.0 };     // Diffuse light color (RGBA)
-    GLfloat light_specular[] = { 0.8, 0.8, 0.8, 1.0 };    // Specular light color (RGBA)
-    glLightfv(SUN_LIGHT, GL_POSITION, light_position);
+    // GLfloat light_position[] = { 1.0, 0.0, 0.0, 0.0 };
+    GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
+    GLfloat light_diffuse[] = { 0.5, 0.5, 0.5, 1.0 };     // Diffuse light color (RGBA)
+    GLfloat light_specular[] = { 0.5, 0.5, 0.5, 1.0 };    // Specular light color (RGBA)
+    // glLightfv(SUN_LIGHT, GL_POSITION, light_position);
     glLightfv(SUN_LIGHT, GL_AMBIENT, light_ambient);
     glLightfv(SUN_LIGHT, GL_DIFFUSE, light_diffuse);
     glLightfv(SUN_LIGHT, GL_SPECULAR, light_specular);
@@ -51,38 +51,38 @@ void initObjects(std::vector<object *> &objs, int num){
     objs.back()->setColor(glm::vec3(0.0f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("Ground");
-    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.back()->setMaterial(MATERIAL::M_FLOOR);
     objs.back()->setTexture(TEXTURE::T_FLOOR, textName);
     // /*
     objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, BOX_SIZE / 2 + 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
     objs.back()->setName("RWall");
-    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.back()->setMaterial(MATERIAL::M_FLOOR);
     // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, -BOX_SIZE / 2 - 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
     objs.back()->setName("LWall");
-    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.back()->setMaterial(MATERIAL::M_FLOOR);
     // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(BOX_SIZE / 2 + 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("FWall");
-    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.back()->setMaterial(MATERIAL::M_FLOOR);
     // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(-BOX_SIZE / 2 - 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("BWall");
-    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.back()->setMaterial(MATERIAL::M_FLOOR);
     // objs.back()->setTexture(TEXTURE::T_WALL, textName);
     objs.push_back(new cube(glm::vec3(0, 3, 0), 6, 6, 6));
     objs.back()->setColor(glm::vec3(1.0f, 1.0f, 1.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("Cube");
-    objs.back()->setMaterial(MATERIAL::M_OBJECT);
+    objs.back()->setMaterial(MATERIAL::M_FLOOR);
     // objs.back()->setTexture(TEXTURE::T_FLOOR, textName);
 
     std::random_device rd;
@@ -189,6 +189,7 @@ void update(glm::vec3 &frontPos, glm::vec3 &cameraPos){
 }
 
 void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, int height, float dt, int fps){
+    glUseProgram(0);
     std::string cameraPosSt = "Camera Position: (" + std::to_string(cameraPos.x) + ", " + std::to_string(cameraPos.y) + ", " + std::to_string(cameraPos.z) + ")";
     std::string frontPosSt = "Front Position: (" + std::to_string(frontPos.x) + ", " + std::to_string(frontPos.y) + ", " + std::to_string(frontPos.z) + ")";
     std::string dtFpsSt = "dt: " + std::to_string(dt) + " fps: " + std::to_string(fps);
@@ -200,8 +201,10 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
     gluOrtho2D(0, width, 0, height);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    SetMaterial(MATERIAL::M_OBJECT, 0.0f, 1.0f, 0.0f);
     glPushMatrix();
+    glPushAttrib(GL_CURRENT_BIT);
+    // Set text color
+    glColor3f(1.0f, 1.0f, 1.0f); // Red color
     glRasterPos2f(10, height - 30);
     for(int i = 0; i < cameraPosSt.length(); i++){
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, cameraPosSt[i]);
@@ -214,6 +217,7 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
     for(int i = 0; i < dtFpsSt.length(); i++){
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, dtFpsSt[i]);
     }
+    glPopAttrib();
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -293,7 +297,6 @@ void drawMultiView(std::vector<object *> &objs, int width, int height, glm::vec3
 
 
 void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::vec3 &cameraPos, glm::vec3 &frontPos, std::vector<object *> &objs){
-    glUseProgram(ReturnProgramID());
     // glUseProgram(0);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -301,6 +304,7 @@ void display(GLFWwindow *window, int width, int height, float dt, int fps, glm::
     glLoadIdentity();
     drawCoordinateString(cameraPos, frontPos, width, height, dt, fps);
 
+    glUseProgram(ReturnProgramID());
     if(viewMode == 0)
         drawSingleView(objs, width, height, cameraPos, frontPos);
     else if(viewMode == 1)
@@ -517,11 +521,12 @@ void updatePhysics(float dt, std::vector<object *> &objs){
     }
     for(auto &obj : objs){
         ball *b = dynamic_cast<ball *>(obj);
+        cube *floorObj = (dynamic_cast<cube *>(objs[0]));
         //彈性係數 0.8
         if(b != nullptr){
             b->setA(glm::vec3(0, -9.8, 0));
             // /*
-            if(b->getLoc().y - b->getR() < ESP){
+            if(b->getLoc().y - b->getR() - floorObj->getW() / 2 < ESP){
                 // F = -u * m * g
                 glm::vec3 v = b->getV();
                 glm::vec3 f = glm::vec3(-0.1 * 9.8 * b->getM() * glm::normalize(v).x, 0, -0.1 * 9.8 * b->getM() * glm::normalize(v).z);
@@ -529,8 +534,8 @@ void updatePhysics(float dt, std::vector<object *> &objs){
                 // continue;
             }
             // */
-            if(b->getLoc().y - b->getR() < ESP){
-                b->setLoc(glm::vec3(b->getLoc().x, b->getR(), b->getLoc().z));
+            if(b->getLoc().y - b->getR() - floorObj->getW() / 2 < ESP){
+                b->setLoc(glm::vec3(b->getLoc().x, b->getR() + floorObj->getW() / 2, b->getLoc().z));
                 b->setV(glm::vec3(b->getV().x, -0.8 * b->getV().y, b->getV().z));
                 b->setColor(glm::vec3(0, 0, 1));
             }

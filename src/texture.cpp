@@ -30,9 +30,9 @@ void TextureInit(TEXTURE textType, unsigned int *textName, unsigned char texture
 }
 
 void SetTexture(TEXTURE textType, unsigned int *textName){
-    float diffuse[] = { 1, 1, 1, 1.0 };
-    float specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    float ambient[] = { 1, 1, 1, 1.0 };
+    float diffuse[] = { 0.8, 0.8, 0.8, 1.0 };
+    float specular[] = { 0.8, 0.8, 0.8, 1.0 };
+    float ambient[] = { 0.8, 0.8, 0.8, 1.0 };
     float emission[] = { 0.0, 0.0, 0.0, 1.0 };
     float shininess = 0.0;
     glEnable(GL_TEXTURE_2D);
