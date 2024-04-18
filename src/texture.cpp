@@ -41,12 +41,12 @@ void SetTexture(TEXTURE textType, unsigned int *textName){
 
     switch(textType){
         case T_OBJECT:
-        shininess = 3;
+        shininess = 5;
         specular[0] = 0.5; specular[1] = 0.5; specular[2] = 0.5;
         break;
 
         case T_FLOOR: case T_WALL:
-        shininess = 1;
+        shininess = 3;
         specular[0] = 0.1; specular[1] = 0.1; specular[2] = 0.1;
         break;
 

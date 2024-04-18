@@ -36,11 +36,11 @@ void glInit(){
 
 void setLight(){
     glEnable(SUN_LIGHT);
-    // GLfloat light_position[] = { 1.0, 0.0, 0.0, 0.0 };
+    GLfloat light_position[] = { 0.0, -1.0, 0.0, 0.0 };
     GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
     GLfloat light_diffuse[] = { 0.5, 0.5, 0.5, 1.0 };     // Diffuse light color (RGBA)
     GLfloat light_specular[] = { 0.5, 0.5, 0.5, 1.0 };    // Specular light color (RGBA)
-    // glLightfv(SUN_LIGHT, GL_POSITION, light_position);
+    glLightfv(SUN_LIGHT, GL_POSITION, light_position);
     glLightfv(SUN_LIGHT, GL_AMBIENT, light_ambient);
     glLightfv(SUN_LIGHT, GL_DIFFUSE, light_diffuse);
     glLightfv(SUN_LIGHT, GL_SPECULAR, light_specular);
@@ -54,25 +54,25 @@ void initObjects(std::vector<object *> &objs, int num){
     objs.back()->setMaterial(MATERIAL::M_FLOOR);
     objs.back()->setTexture(TEXTURE::T_FLOOR, textName);
     // /*
-    objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, BOX_SIZE / 2 + 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
+    objs.push_back(new cube(glm::vec3(0, BOX_SIZE, BOX_SIZE / 2 + 0.5), BOX_SIZE, BOX_SIZE * 2, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
     objs.back()->setName("RWall");
     objs.back()->setMaterial(MATERIAL::M_FLOOR);
     // objs.back()->setTexture(TEXTURE::T_WALL, textName);
-    objs.push_back(new cube(glm::vec3(0, BOX_SIZE / 2, -BOX_SIZE / 2 - 0.5), BOX_SIZE, BOX_SIZE * 1.5, 0.5));
+    objs.push_back(new cube(glm::vec3(0, BOX_SIZE, -BOX_SIZE / 2 - 0.5), BOX_SIZE, BOX_SIZE * 2, 0.5));
     objs.back()->setColor(glm::vec3(0.5f, 0.0f, 0.5f));
     objs.back()->setM(1e10);
     objs.back()->setName("LWall");
     objs.back()->setMaterial(MATERIAL::M_FLOOR);
     // objs.back()->setTexture(TEXTURE::T_WALL, textName);
-    objs.push_back(new cube(glm::vec3(BOX_SIZE / 2 + 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
+    objs.push_back(new cube(glm::vec3(BOX_SIZE / 2 + 0.5, BOX_SIZE, 0), 0.5, BOX_SIZE * 2, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("FWall");
     objs.back()->setMaterial(MATERIAL::M_FLOOR);
     // objs.back()->setTexture(TEXTURE::T_WALL, textName);
-    objs.push_back(new cube(glm::vec3(-BOX_SIZE / 2 - 0.5, BOX_SIZE / 2, 0), 0.5, BOX_SIZE * 1.5, BOX_SIZE));
+    objs.push_back(new cube(glm::vec3(-BOX_SIZE / 2 - 0.5, BOX_SIZE, 0), 0.5, BOX_SIZE * 2, BOX_SIZE));
     objs.back()->setColor(glm::vec3(0.5f, 0.5f, 0.0f));
     objs.back()->setM(1e10);
     objs.back()->setName("BWall");
@@ -97,8 +97,8 @@ void initObjects(std::vector<object *> &objs, int num){
             for(int k = 0; k < 4 && count < K; k++){
                 objs.push_back(new ball(glm::vec3(8 - k * 5, 10 + j, -BOX_SIZE / 2 - 0.5 + i), 0.3));
                 objs.back()->setColor(glm::vec3(1.0f, 0, 0));
-                objs.back()->setM(1);
-                // objs.back()->setM(float(gen() % 5) + 1);
+                // objs.back()->setM(1);
+                objs.back()->setM(float(gen() % 5) + 1);
                 objs.back()->setMaterial(MATERIAL::M_OBJECT);
                 int rx = (gen() % 2) ? 1 : -1;
                 int ry = (gen() % 2) ? 1 : -1;
@@ -204,7 +204,7 @@ void drawCoordinateString(glm::vec3 cameraPos, glm::vec3 frontPos, int width, in
     glPushMatrix();
     glPushAttrib(GL_CURRENT_BIT);
     // Set text color
-    glColor3f(1.0f, 1.0f, 1.0f); // Red color
+    glColor3f(0.0f, 1.0f, 1.0f); // Red color
     glRasterPos2f(10, height - 30);
     for(int i = 0; i < cameraPosSt.length(); i++){
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, cameraPosSt[i]);
@@ -529,7 +529,7 @@ void updatePhysics(float dt, std::vector<object *> &objs){
             if(b->getLoc().y - b->getR() - floorObj->getW() / 2 < ESP){
                 // F = -u * m * g
                 glm::vec3 v = b->getV();
-                glm::vec3 f = glm::vec3(-0.1 * 9.8 * b->getM() * glm::normalize(v).x, 0, -0.1 * 9.8 * b->getM() * glm::normalize(v).z);
+                glm::vec3 f = glm::vec3(-0.05 * 9.8 * b->getM() * glm::normalize(v).x, 0, -0.05 * 9.8 * b->getM() * glm::normalize(v).z);
                 b->addA(f / b->getM());
                 // continue;
             }

@@ -13,13 +13,13 @@ void SetMaterial(MATERIAL materialType, float r, float g, float b){
         // plastic
         case M_OBJECT:
         mat_specular[0] = 1; mat_specular[1] = 1; mat_specular[2] = 1;
-        mat_shininess[0] = 3;
+        mat_shininess[0] = 5;
         break;
 
         // earth
         case M_FLOOR: case M_WALL:
         mat_specular[0] =1; mat_specular[1] = 1; mat_specular[2] = 1;
-        mat_shininess[0] = 1;
+        mat_shininess[0] = 3;
         break;
 
 
